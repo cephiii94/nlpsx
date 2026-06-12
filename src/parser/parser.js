@@ -20,17 +20,27 @@ class Parser {
   }
 
   // Consume a token of the expected type, advancing the pointer.
-  // Throws if the next token doesn't match the expectation.
-  // Consume a token of the expected type, advancing the pointer.
-  // Throws a detailed syntax error if the next token doesn't match.
+  // Throws a detailed and friendly syntax error if the next token doesn't match.
   consume(expectedType) {
     const token = this.currentToken();
 
     if (!token || token.type !== expectedType) {
       const positionInfo = token 
         ? `di Baris ${token.line}, Kolom ${token.column}`
-        : "di akhir file (EOF)";
-      throw new Error(`Error Sintaks: Mengharapkan token tipe "${expectedType}", tetapi mendapatkan "${token?.type || 'EOF'}" ${positionInfo}`);
+        : "di akhir program (EOF)";
+      
+      let friendlyMessage = `Error Sintaks [${positionInfo}]: Mengharapkan simbol atau kata kunci "${expectedType}", tetapi mendapatkan "${token?.value || token?.type || 'EOF'}"`;
+      
+      // Custom helpful tips
+      if (expectedType === TokenType.THEN && token?.type === TokenType.PRINT) {
+        friendlyMessage += `. Tips: Anda menulis pernyataan "jika" tetapi lupa menulis kata kunci "maka" sebelum menulis "tampilkan".`;
+      } else if (expectedType === TokenType.EQUALS) {
+        friendlyMessage += `. Tips: Pastikan Anda menulis tanda "=" untuk mengisi nilai variabel.`;
+      } else if (expectedType === TokenType.IDENTIFIER) {
+        friendlyMessage += `. Tips: Pastikan Anda menulis nama variabel yang valid.`;
+      }
+      
+      throw new Error(friendlyMessage);
     }
 
     this.advance();
@@ -41,6 +51,19 @@ class Parser {
   parseExpression() {
     const left = this.currentToken();
 
+    // Support unary negation, e.g. -5
+    if (left.type === TokenType.MINUS) {
+      this.advance();
+      const operand = this.parseExpression();
+      return {
+        type: "UnaryExpression",
+        operator: "-",
+        right: operand,
+        line: left.line,
+        column: left.column
+      };
+    }
+
     const allowedLeftTypes = [
       TokenType.STRING,
       TokenType.NUMBER,
@@ -50,7 +73,7 @@ class Parser {
     ];
 
     if (!allowedLeftTypes.includes(left.type)) {
-      throw new Error(`Error Sintaks: Token tipe "${left.type}" tidak valid sebagai bagian dari ekspresi di Baris ${left.line}, Kolom ${left.column}`);
+      throw new Error(`Error Sintaks [Baris ${left.line}, Kolom ${left.column}]: Nilai atau simbol "${left.value || left.type}" tidak valid sebagai bagian dari ekspresi.`);
     }
 
     this.advance();
@@ -58,6 +81,9 @@ class Parser {
     const nextToken = this.currentToken();
     const isBinaryOperator = [
       TokenType.PLUS,
+      TokenType.MINUS,
+      TokenType.STAR,
+      TokenType.SLASH,
       TokenType.GT,
       TokenType.LT,
       TokenType.GTE,
@@ -79,7 +105,7 @@ class Parser {
       ];
 
       if (!allowedRightTypes.includes(right.type)) {
-        throw new Error(`Error Sintaks: Mengharapkan operand setelah operator "${nextToken.value}" di Baris ${nextToken.line}, Kolom ${nextToken.column}, tetapi mendapatkan "${right.type}"`);
+        throw new Error(`Error Sintaks [Baris ${nextToken.line}, Kolom ${nextToken.column}]: Mengharapkan nilai angka, teks, atau nama variabel setelah operator "${nextToken.value}", tetapi mendapatkan "${right.value || right.type}".`);
       }
 
       this.advance();
@@ -109,7 +135,7 @@ class Parser {
       dataTypeToken.type !== TokenType.NUMBER_TYPE &&
       dataTypeToken.type !== TokenType.BOOLEAN_TYPE
     ) {
-      throw new Error(`Error Sintaks: Mengharapkan tipe data (teks, angka, atau boolean) di Baris ${dataTypeToken.line}, Kolom ${dataTypeToken.column}, tetapi mendapatkan "${dataTypeToken.value || dataTypeToken.type}"`);
+      throw new Error(`Error Sintaks [Baris ${dataTypeToken.line}, Kolom ${dataTypeToken.column}]: Tipe data "${dataTypeToken.value || dataTypeToken.type}" tidak dikenal. Gunakan kata kunci tipe "teks", "angka", atau "boolean".`);
     }
 
     this.advance();
@@ -154,7 +180,7 @@ class Parser {
       };
     }
 
-    throw new Error(`Error Sintaks: "tampilkan" mengharapkan teks atau nama variabel di Baris ${token.line}, Kolom ${token.column}, tetapi mendapatkan "${token.type}"`);
+    throw new Error(`Error Sintaks [Baris ${token.line}, Kolom ${token.column}]: Perintah "tampilkan" mengharapkan teks langsung di dalam tanda kutip atau nama variabel, tetapi mendapatkan "${token.value || token.type}".`);
   }
 
   // Parse an if statement: "jika <expression> maka <statement> [selain <statement>]"
@@ -188,7 +214,7 @@ class Parser {
     if (token.type === TokenType.PRINT) return this.parsePrintStatement();
     if (token.type === TokenType.IF) return this.parseIfStatement();
 
-    throw new Error(`Error Sintaks: Pernyataan tidak dikenal "${token.value || token.type}" di Baris ${token.line}, Kolom ${token.column}`);
+    throw new Error(`Error Sintaks [Baris ${token.line}, Kolom ${token.column}]: Pernyataan "${token.value || token.type}" tidak dikenal. Gunakan kata kunci seperti "buat" untuk variabel, "tampilkan" untuk mencetak output, atau "jika" untuk kondisi.`);
   }
 
   // Parse the whole token stream into a Program AST node.

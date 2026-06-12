@@ -26,6 +26,9 @@ const TokenType = {
   // Operators / punctuation
   EQUALS: "EQUALS",
   PLUS: "PLUS",
+  MINUS: "MINUS",
+  STAR: "STAR",
+  SLASH: "SLASH",
   GT: "GT",
   LT: "LT",
   GTE: "GTE",

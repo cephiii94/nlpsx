@@ -46,7 +46,7 @@ const tests = [
     code: `
       tampilkan nama_baru
     `,
-    expectedError: "Error Runtime: Variabel \"nama_baru\" belum dideklarasikan",
+    expectedError: "Error Runtime [Baris 2]: Variabel \"nama_baru\" belum dibuat",
   },
   {
     name: "Error Sintaks: Kurang Keyword maka",
@@ -54,7 +54,46 @@ const tests = [
       jika 5 > 3
           tampilkan "OK"
     `,
-    expectedError: "Error Sintaks: Mengharapkan token tipe \"THEN\"",
+    expectedError: "Error Sintaks [di Baris 3, Kolom 11]: Mengharapkan simbol atau kata kunci \"THEN\"",
+  },
+  {
+    name: "Angka Desimal & Uner Negatif",
+    code: `
+      buat angka a = 3.5
+      buat angka b = -1.5
+      buat angka c = a + b
+      tampilkan c
+    `,
+    expected: [2],
+  },
+  {
+    name: "String Escape Characters",
+    code: `
+      buat teks s = "Halo\\t\\"Budi\\"\\nKabar Baik"
+      tampilkan s
+    `,
+    expected: ["Halo\t\"Budi\"\nKabar Baik"],
+  },
+  {
+    name: "Error Runtime: Type Mismatch Angka diisi Teks",
+    code: `
+      buat angka var_salah = "Halo"
+    `,
+    expectedError: "Error Runtime [Baris 2]: Tipe data tidak cocok. Variabel \"var_salah\" dideklarasikan sebagai \"angka\", tetapi Anda mengisinya dengan tipe \"string\"",
+  },
+  {
+    name: "Error Runtime: Type Mismatch Teks diisi Boolean",
+    code: `
+      buat teks var_salah = benar
+    `,
+    expectedError: "Error Runtime [Baris 2]: Tipe data tidak cocok. Variabel \"var_salah\" dideklarasikan sebagai \"teks\", tetapi Anda mengisinya dengan tipe \"boolean\"",
+  },
+  {
+    name: "Error Runtime: Type Mismatch Boolean diisi Angka",
+    code: `
+      buat boolean var_salah = 12
+    `,
+    expectedError: "Error Runtime [Baris 2]: Tipe data tidak cocok. Variabel \"var_salah\" dideklarasikan sebagai \"boolean\", tetapi Anda mengisinya dengan tipe \"number\"",
   }
 ];
 

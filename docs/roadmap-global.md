@@ -23,7 +23,7 @@ Features:
 
 Features:
 
-* [ ] Else Statement
+* [x] Else Statement
 * [ ] Loop
 * [ ] Function
 * [ ] Return
@@ -47,10 +47,10 @@ Features:
 
 Features:
 
-* [ ] NLPSX CLI
+* [/] NLPSX CLI (Basic Runner)
 * [ ] Package Manager
 * [ ] Project Structure
-* [ ] Error System
+* [x] Error System (Friendly Error v1)
 
 ---
 

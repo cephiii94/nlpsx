@@ -19,3 +19,45 @@
 - Memperbarui src/main.js: Menambahkan kemampuan membaca berkas input dari argumen CLI (argv).
 - Membuat berkas unit test baru di tests/run_tests.js untuk menguji kasus sukses dan kasus eror secara otomatis.
 - Hasil Uji: 6/6 test cases lolos dengan sukses.
+
+[2026-06-12 15:02:00] SPRINT 3 - DESIMAL, ESCAPE STRING & TYPE SAFETY
+- Memperbarui src/lexer/token.js: Menambahkan token MINUS, STAR, dan SLASH.
+- Memperbarui src/lexer/lexer.js:
+  * Memperbarui readNumber() untuk mendukung parsing angka pecahan (float/desimal) dengan pemisah titik (.).
+  * Memperbarui readString() untuk memproses escape characters (\n, \t, \", \\).
+  * Memperbarui getNextToken() untuk mendeteksi operator matematika -, *, /.
+- Memperbarui src/parser/parser.js:
+  * Menambahkan penanganan UnaryExpression di parseExpression() untuk mendukung angka negatif (uner -).
+  * Menambahkan operator biner baru (-, *, /) dalam daftar operator biner yang valid.
+- Memperbarui src/interpreter/interpreter.js:
+  * Menambahkan validasi tipe data (Type Safety) pada VariableDeclaration di execute() saat runtime (angka -> number, teks -> string, boolean -> boolean).
+  * Menambahkan evaluasi UnaryExpression di evaluate().
+  * Menambahkan penanganan evaluasi operasi biner baru (-, *, /) beserta penanganan pembagian dengan nol.
+- Memperbarui tests/run_tests.js: Menambahkan 5 kasus pengujian baru (bilangan desimal, negasi, escape string, dan 3 jenis eror type safety).
+- Hasil Uji: 11/11 test cases lolos dengan sukses.
+
+[2026-06-12 15:30:00] DOKUMENTASI FITUR
+- Membuat berkas dokumentasi baru docs/fitur-bahasa.md yang menjelaskan seluruh fitur yang didukung oleh NLPSX saat ini beserta contoh kodenya.
+
+[2026-06-12 15:43:00] SPRINT 4 - SISTEM EROR RAMAH PEMULA (FRIENDLY ERROR)
+- Memperbarui src/lexer/lexer.js: Memoles pesan eror untuk string tidak ditutup, karakter !, dan karakter tidak dikenal agar bermakna ramah manusia.
+- Memperbarui src/parser/parser.js:
+  * Memoles consume() agar melempar eror sintaks terperinci beserta koordinat baris/kolom dan tips tambahan yang dinamis (misal: tips lupa menulis 'maka').
+  * Memoles parseExpression(), parseVariableDeclaration(), parsePrintStatement(), dan parseStatement() untuk pesan eror ramah pemula.
+- Memperbarui src/interpreter/interpreter.js:
+  * Memoles pesan eror runtime saat eksekusi variabel belum dideklarasikan.
+  * Memoles pesan eror runtime saat terjadi kegagalan type safety checking pada runtime.
+  * Memoles pesan eror runtime untuk pembagian dengan nol.
+- Memperbarui tests/run_tests.js: Menyesuaikan ekspektasi string eror pada unit test agar cocok dengan format Friendly Error yang baru.
+- Hasil Uji: 11/11 test cases lolos dengan sukses.
+
+[2026-06-12 15:56:00] UPDATE README.MD
+- Menambahkan bab "Fitur Utama (Pembeda NLPSX)" pada README.md untuk menjelaskan kelebihan unik NLPSX (sintaks natural lokal, type safety default, friendly error, dukungan desimal/escape, arsitektur modular).
+
+[2026-06-12 15:58:00] REVISI ROADMAP GLOBAL
+- Memperbarui docs/roadmap-global.md untuk menandai Else Statement sebagai [x] (selesai), Error System sebagai [x] (selesai v1), dan NLPSX CLI sebagai [/] (selesai sebagian untuk basic runner).
+
+
+
+
+

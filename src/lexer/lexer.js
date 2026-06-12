@@ -78,11 +78,29 @@ class Lexer {
     this.advance(); // consume opening quote
 
     while (this.currentChar() !== null && this.currentChar() !== '"') {
-      text += this.advance();
+      const char = this.currentChar();
+      if (char === "\\") {
+        this.advance(); // consume '\\'
+        const nextChar = this.currentChar();
+        if (nextChar === "n") {
+          text += "\n";
+        } else if (nextChar === "t") {
+          text += "\t";
+        } else if (nextChar === '"') {
+          text += '"';
+        } else if (nextChar === "\\") {
+          text += "\\";
+        } else {
+          text += "\\" + nextChar; // fallback
+        }
+        this.advance(); // consume escaped char
+      } else {
+        text += this.advance();
+      }
     }
 
     if (this.currentChar() !== '"') {
-      throw new Error(`[Baris ${startLine}, Kolom ${startColumn}] Teks belum ditutup dengan tanda kutip.`);
+      throw new Error(`Error Sintaks [Baris ${startLine}, Kolom ${startColumn}]: Teks/String belum ditutup dengan tanda kutip ganda ("). Pastikan setiap teks dibuka dan ditutup dengan tanda kutip ganda.`);
     }
 
     this.advance(); // consume closing quote
@@ -100,6 +118,17 @@ class Lexer {
         /[0-9]/.test(this.currentChar())
     ) {
         number += this.advance();
+    }
+
+    // Check if there is a decimal point
+    if (this.currentChar() === "." && /[0-9]/.test(this.source[this.position + 1])) {
+        number += this.advance(); // consume '.'
+        while (
+            this.currentChar() !== null &&
+            /[0-9]/.test(this.currentChar())
+        ) {
+            number += this.advance();
+        }
     }
 
     return new Token(
@@ -162,7 +191,7 @@ class Lexer {
         this.advance();
         return new Token(TokenType.NEQ, "!=", startLine, startColumn);
       }
-      throw new Error(`[Baris ${startLine}, Kolom ${startColumn}] Karakter tidak dikenal: !`);
+      throw new Error(`Error Sintaks [Baris ${startLine}, Kolom ${startColumn}]: Karakter "!" tidak dikenal. Apakah Anda ingin menulis perbandingan tidak sama dengan ("!=")?`);
     }
 
     if (/[0-9]/.test(char)) {
@@ -174,7 +203,22 @@ class Lexer {
       return new Token(TokenType.PLUS, "+", startLine, startColumn);
     }
 
-    throw new Error(`[Baris ${startLine}, Kolom ${startColumn}] Karakter tidak dikenal: ${char}`);
+    if (char === "-") {
+      this.advance();
+      return new Token(TokenType.MINUS, "-", startLine, startColumn);
+    }
+
+    if (char === "*") {
+      this.advance();
+      return new Token(TokenType.STAR, "*", startLine, startColumn);
+    }
+
+    if (char === "/") {
+      this.advance();
+      return new Token(TokenType.SLASH, "/", startLine, startColumn);
+    }
+
+    throw new Error(`Error Sintaks [Baris ${startLine}, Kolom ${startColumn}]: Karakter "${char}" tidak dikenal dalam bahasa NLPSX.`);
   }
 
   tokenize() {
