@@ -1,4 +1,7 @@
 // src/lexer/lexer.js
+// A simple lexer for the NLPSX language. Converts source text into tokens
+// consumed by the parser. Error messages are in Indonesian to match the
+// project's existing style.
 
 const { TokenType, Token } = require("./token");
 
@@ -10,6 +13,7 @@ class Lexer {
     this.column = 1;
   }
 
+  // Return the current character or null when at end of input.
   currentChar() {
     if (this.position >= this.source.length) {
       return null;
@@ -18,59 +22,56 @@ class Lexer {
     return this.source[this.position];
   }
 
+  // Advance the lexer's position by one character and return the previous char.
   advance() {
     const char = this.currentChar();
-
     this.position++;
     this.column++;
-
     return char;
   }
 
-    skipWhitespace() {
-    while (
-        this.currentChar() !== null &&
-        /\s/.test(this.currentChar())
-    ) {
-        this.advance();
+  // Skip whitespace characters (spaces, tabs, newlines).
+  skipWhitespace() {
+    while (this.currentChar() !== null && /\s/.test(this.currentChar())) {
+      this.advance();
     }
-    }
+  }
 
-    readWord() {
+  // Read an identifier or keyword (letters and underscore only).
+  // Recognizes language keywords and returns the appropriate token.
+  readWord() {
     let word = "";
 
-    while (
-        this.currentChar() !== null &&
-        /[a-zA-Z_]/.test(this.currentChar())
-    ) {
-        word += this.advance();
+    while (this.currentChar() !== null && /[a-zA-Z_]/.test(this.currentChar())) {
+      word += this.advance();
     }
 
+    // Keywords in Indonesian
     if (word === "tampilkan") {
-        return new Token(TokenType.PRINT, word);
+      return new Token(TokenType.PRINT, word);
     }
 
     if (word === "buat") {
-        return new Token(TokenType.CREATE, word);
+      return new Token(TokenType.CREATE, word);
     }
 
     if (word === "teks") {
-        return new Token(TokenType.TEXT_TYPE, word);
+      return new Token(TokenType.TEXT_TYPE, word);
     }
 
     if (word === "angka") {
-    return new Token(TokenType.NUMBER_TYPE, word);
+      return new Token(TokenType.NUMBER_TYPE, word);
     }
-
-
 
     return new Token(TokenType.IDENTIFIER, word);
-    }
+  }
 
+  // Read a double-quoted string literal. Throws if closing quote is missing.
   readString() {
     let text = "";
     const startColumn = this.column;
 
+    // consume opening quote
     this.advance();
 
     while (this.currentChar() !== null && this.currentChar() !== '"') {
@@ -81,26 +82,24 @@ class Lexer {
       throw new Error("Teks belum ditutup dengan tanda kutip.");
     }
 
+    // consume closing quote
     this.advance();
 
     return new Token(TokenType.STRING, text, this.line, startColumn);
   }
-    readNumber() {
+
+  // Read an integer number (sequence of digits).
+  readNumber() {
     let number = "";
 
-    while (
-        this.currentChar() !== null &&
-        /[0-9]/.test(this.currentChar())
-    ) {
-        number += this.advance();
+    while (this.currentChar() !== null && /[0-9]/.test(this.currentChar())) {
+      number += this.advance();
     }
 
-    return new Token(
-        TokenType.NUMBER,
-        Number(number)
-    );
-    }
+    return new Token(TokenType.NUMBER, Number(number));
+  }
 
+  // Produce the next token from input or EOF.
   getNextToken() {
     this.skipWhitespace();
 
@@ -119,25 +118,25 @@ class Lexer {
     }
 
     if (char === "=") {
-     this.advance();
-     return new Token(TokenType.EQUALS, "=");
+      this.advance();
+      return new Token(TokenType.EQUALS, "=");
     }
 
     if (/[0-9]/.test(char)) {
-        return this.readNumber();
+      return this.readNumber();
     }
 
     if (char === "+") {
-    this.advance();
-    return new Token(TokenType.PLUS, "+");
+      this.advance();
+      return new Token(TokenType.PLUS, "+");
     }
-    
+
     throw new Error(`Karakter tidak dikenal: ${char}`);
   }
 
+  // Tokenize the entire input into an array of tokens.
   tokenize() {
     const tokens = [];
-
     let token = this.getNextToken();
 
     while (token.type !== TokenType.EOF) {
@@ -146,7 +145,6 @@ class Lexer {
     }
 
     tokens.push(token);
-
     return tokens;
   }
 }
