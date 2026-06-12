@@ -27,27 +27,39 @@ class Lexer {
     return char;
   }
 
-  skipWhitespace() {
-    while (this.currentChar() === " " || this.currentChar() === "\n" || this.currentChar() === "\t") {
-      this.advance();
+    skipWhitespace() {
+    while (
+        this.currentChar() !== null &&
+        /\s/.test(this.currentChar())
+    ) {
+        this.advance();
     }
-  }
+    }
 
-  readWord() {
+    readWord() {
     let word = "";
-    const startColumn = this.column;
 
-    while (this.currentChar() !== null && /[a-zA-Z_]/.test(this.currentChar())) {
-      word += this.advance();
+    while (
+        this.currentChar() !== null &&
+        /[a-zA-Z_]/.test(this.currentChar())
+    ) {
+        word += this.advance();
     }
 
     if (word === "tampilkan") {
-      return new Token(TokenType.PRINT, word, this.line, startColumn);
+        return new Token(TokenType.PRINT, word);
     }
 
-    throw new Error(`Keyword tidak dikenal: ${word}`);
-  }
+    if (word === "buat") {
+        return new Token(TokenType.CREATE, word);
+    }
 
+    if (word === "teks") {
+        return new Token(TokenType.TEXT_TYPE, word);
+    }
+
+    return new Token(TokenType.IDENTIFIER, word);
+    }
   readString() {
     let text = "";
     const startColumn = this.column;
@@ -82,6 +94,11 @@ class Lexer {
 
     if (char === '"') {
       return this.readString();
+    }
+
+    if (char === "=") {
+     this.advance();
+     return new Token(TokenType.EQUALS, "=");
     }
 
     throw new Error(`Karakter tidak dikenal: ${char}`);

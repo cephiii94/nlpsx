@@ -1,8 +1,7 @@
-// src/interpreter/interpreter.js
-
 class Interpreter {
   constructor(ast) {
     this.ast = ast;
+    this.variables = {};
   }
 
   run() {
@@ -12,7 +11,17 @@ class Interpreter {
   }
 
   execute(node) {
+    if (node.type === "VariableDeclaration") {
+      this.variables[node.name] = node.value;
+      return;
+    }
+
     if (node.type === "PrintStatement") {
+      if (node.valueType === "identifier") {
+        console.log(this.variables[node.value]);
+        return;
+      }
+
       console.log(node.value);
       return;
     }

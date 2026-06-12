@@ -2,6 +2,13 @@
 
 const TokenType = {
   PRINT: "PRINT",
+
+  CREATE: "CREATE",
+  TEXT_TYPE: "TEXT_TYPE",
+
+  IDENTIFIER: "IDENTIFIER",
+  EQUALS: "EQUALS",
+
   STRING: "STRING",
   EOF: "EOF",
 };
