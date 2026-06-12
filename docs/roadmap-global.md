@@ -13,9 +13,9 @@ Features:
 * [x] Number
 * [x] Variable
 * [x] Addition Operator
-* [ ] Boolean
-* [ ] Comparison Operator
-* [ ] If Statement
+* [x] Boolean
+* [x] Comparison Operator
+* [x] If Statement
 
 ---
 

@@ -1,0 +1,5 @@
+nama = "Cecep"
+
+jika nama == "Cecep" maka
+    tampilkan("Halo Admin Gudang")
+selesai

@@ -23,28 +23,28 @@ Dewasa
 
 ### Lexer
 
-* [ ] BOOLEAN_TYPE
-* [ ] TRUE
-* [ ] FALSE
-* [ ] IF
-* [ ] THEN
-* [ ] GREATER_THAN
+* [x] BOOLEAN_TYPE
+* [x] TRUE
+* [x] FALSE
+* [x] IF
+* [x] THEN
+* [x] GREATER_THAN
 
 ### Parser
 
-* [ ] Boolean Literal
-* [ ] Comparison Expression
-* [ ] If Statement
+* [x] Boolean Literal
+* [x] Comparison Expression
+* [x] If Statement
 
 ### Interpreter
 
-* [ ] Boolean Evaluation
-* [ ] Comparison Evaluation
-* [ ] If Execution
+* [x] Boolean Evaluation
+* [x] Comparison Evaluation
+* [x] If Execution
 
 ### Test Cases
 
-* [ ] umur > 18
-* [ ] umur < 18
-* [ ] benar
-* [ ] salah
+* [x] umur > 18
+* [x] umur < 18
+* [x] benar
+* [x] salah

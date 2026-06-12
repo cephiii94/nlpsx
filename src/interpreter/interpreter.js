@@ -3,10 +3,11 @@
 // print statements and evaluates simple expressions (currently only +).
 
 class Interpreter {
-  constructor(ast) {
+  constructor(ast, outputFn = console.log) {
     this.ast = ast;
     // runtime variable storage: name -> value
     this.variables = {};
+    this.output = outputFn;
   }
 
   // Execute every top-level statement in the program AST.
@@ -27,15 +28,28 @@ class Interpreter {
     if (node.type === "PrintStatement") {
       // Print either a literal string or the value of an identifier.
       if (node.valueType === "identifier") {
-        console.log(this.variables[node.value]);
+        if (!(node.value in this.variables)) {
+          throw new Error(`Error Runtime: Variabel "${node.value}" belum dideklarasikan di Baris ${node.line}, Kolom ${node.column}`);
+        }
+        this.output(this.variables[node.value]);
         return;
       }
 
-      console.log(node.value);
+      this.output(node.value);
       return;
     }
 
-    throw new Error(`Node tidak dikenal: ${node.type}`);
+    if (node.type === "IfStatement") {
+      const conditionValue = this.evaluate(node.condition);
+      if (conditionValue) {
+        this.execute(node.consequent);
+      } else if (node.alternate) {
+        this.execute(node.alternate);
+      }
+      return;
+    }
+
+    throw new Error(`Error Runtime: Node tidak dikenal "${node.type}" di Baris ${node.line}, Kolom ${node.column}`);
   }
 
   // Evaluate an expression node and return its runtime value.
@@ -44,7 +58,14 @@ class Interpreter {
       return node.value;
     }
 
+    if (node.type === "TRUE" || node.type === "FALSE") {
+      return node.value;
+    }
+
     if (node.type === "IDENTIFIER") {
+      if (!(node.value in this.variables)) {
+        throw new Error(`Error Runtime: Variabel "${node.value}" belum dideklarasikan di Baris ${node.line}, Kolom ${node.column}`);
+      }
       return this.variables[node.value];
     }
 
@@ -52,13 +73,30 @@ class Interpreter {
       const left = this.evaluate(node.left);
       const right = this.evaluate(node.right);
 
-      // Only addition supported for now.
-      if (node.operator === "+") {
-        return left + right;
+      switch (node.operator) {
+        case "+":
+          if (typeof left !== typeof right) {
+            throw new Error(`Error Runtime: Operasi "+" tidak kompatibel antara tipe ${typeof left} dan ${typeof right} di Baris ${node.line}, Kolom ${node.column}`);
+          }
+          return left + right;
+        case ">":
+          return left > right;
+        case "<":
+          return left < right;
+        case ">=":
+          return left >= right;
+        case "<=":
+          return left <= right;
+        case "==":
+          return left == right;
+        case "!=":
+          return left != right;
+        default:
+          throw new Error(`Error Runtime: Operator tidak dikenal "${node.operator}" di Baris ${node.line}, Kolom ${node.column}`);
       }
     }
 
-    throw new Error(`Expression tidak dikenal: ${node.type}`);
+    throw new Error(`Error Runtime: Ekspresi tidak dikenal "${node.type}" di Baris ${node.line}, Kolom ${node.column}`);
   }
 }
 

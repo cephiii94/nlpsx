@@ -1,7 +1,4 @@
 // src/lexer/lexer.js
-// A simple lexer for the NLPSX language. Converts source text into tokens
-// consumed by the parser. Error messages are in Indonesian to match the
-// project's existing style.
 
 const { TokenType, Token } = require("./token");
 
@@ -13,7 +10,6 @@ class Lexer {
     this.column = 1;
   }
 
-  // Return the current character or null when at end of input.
   currentChar() {
     if (this.position >= this.source.length) {
       return null;
@@ -22,91 +18,107 @@ class Lexer {
     return this.source[this.position];
   }
 
-  // Advance the lexer's position by one character and return the previous char.
   advance() {
     const char = this.currentChar();
+
     this.position++;
-    this.column++;
+    if (char === "\n") {
+      this.line++;
+      this.column = 1;
+    } else {
+      this.column++;
+    }
+
     return char;
   }
 
-  // Skip whitespace characters (spaces, tabs, newlines).
   skipWhitespace() {
-    while (this.currentChar() !== null && /\s/.test(this.currentChar())) {
-      this.advance();
+    while (
+        this.currentChar() !== null &&
+        /\s/.test(this.currentChar())
+    ) {
+        this.advance();
     }
   }
 
-  // Read an identifier or keyword (letters and underscore only).
-  // Recognizes language keywords and returns the appropriate token.
   readWord() {
     let word = "";
-
-    while (this.currentChar() !== null && /[a-zA-Z_]/.test(this.currentChar())) {
-      word += this.advance();
-    }
-
-    // Keywords in Indonesian
-    if (word === "tampilkan") {
-      return new Token(TokenType.PRINT, word);
-    }
-
-    if (word === "buat") {
-      return new Token(TokenType.CREATE, word);
-    }
-
-    if (word === "teks") {
-      return new Token(TokenType.TEXT_TYPE, word);
-    }
-
-    if (word === "angka") {
-      return new Token(TokenType.NUMBER_TYPE, word);
-    }
-
-    return new Token(TokenType.IDENTIFIER, word);
-  }
-
-  // Read a double-quoted string literal. Throws if closing quote is missing.
-  readString() {
-    let text = "";
+    const startLine = this.line;
     const startColumn = this.column;
 
-    // consume opening quote
-    this.advance();
+    while (
+        this.currentChar() !== null &&
+        /[a-zA-Z_]/.test(this.currentChar())
+    ) {
+        word += this.advance();
+    }
+
+    let type = TokenType.IDENTIFIER;
+    let value = word;
+
+    if (word === "tampilkan") type = TokenType.PRINT;
+    else if (word === "buat") type = TokenType.CREATE;
+    else if (word === "teks") type = TokenType.TEXT_TYPE;
+    else if (word === "angka") type = TokenType.NUMBER_TYPE;
+    else if (word === "boolean") type = TokenType.BOOLEAN_TYPE;
+    else if (word === "benar") { type = TokenType.TRUE; value = true; }
+    else if (word === "salah") { type = TokenType.FALSE; value = false; }
+    else if (word === "jika") type = TokenType.IF;
+    else if (word === "maka") type = TokenType.THEN;
+    else if (word === "selain") type = TokenType.ELSE;
+
+    return new Token(type, value, startLine, startColumn);
+  }
+
+  readString() {
+    let text = "";
+    const startLine = this.line;
+    const startColumn = this.column;
+
+    this.advance(); // consume opening quote
 
     while (this.currentChar() !== null && this.currentChar() !== '"') {
       text += this.advance();
     }
 
     if (this.currentChar() !== '"') {
-      throw new Error("Teks belum ditutup dengan tanda kutip.");
+      throw new Error(`[Baris ${startLine}, Kolom ${startColumn}] Teks belum ditutup dengan tanda kutip.`);
     }
 
-    // consume closing quote
-    this.advance();
+    this.advance(); // consume closing quote
 
-    return new Token(TokenType.STRING, text, this.line, startColumn);
+    return new Token(TokenType.STRING, text, startLine, startColumn);
   }
 
-  // Read an integer number (sequence of digits).
   readNumber() {
     let number = "";
+    const startLine = this.line;
+    const startColumn = this.column;
 
-    while (this.currentChar() !== null && /[0-9]/.test(this.currentChar())) {
-      number += this.advance();
+    while (
+        this.currentChar() !== null &&
+        /[0-9]/.test(this.currentChar())
+    ) {
+        number += this.advance();
     }
 
-    return new Token(TokenType.NUMBER, Number(number));
+    return new Token(
+        TokenType.NUMBER,
+        Number(number),
+        startLine,
+        startColumn
+    );
   }
 
-  // Produce the next token from input or EOF.
   getNextToken() {
     this.skipWhitespace();
 
+    const startLine = this.line;
+    const startColumn = this.column;
     const char = this.currentChar();
 
     if (char === null) {
-      return new Token(TokenType.EOF, null, this.line, this.column);
+      return new Token(TokenType.EOF, null, startLine, startColumn);
     }
 
     if (/[a-zA-Z_]/.test(char)) {
@@ -119,24 +131,55 @@ class Lexer {
 
     if (char === "=") {
       this.advance();
-      return new Token(TokenType.EQUALS, "=");
+      if (this.currentChar() === "=") {
+        this.advance();
+        return new Token(TokenType.EQ, "==", startLine, startColumn);
+      }
+      return new Token(TokenType.EQUALS, "=", startLine, startColumn);
+    }
+
+    if (char === ">") {
+      this.advance();
+      if (this.currentChar() === "=") {
+        this.advance();
+        return new Token(TokenType.GTE, ">=", startLine, startColumn);
+      }
+      return new Token(TokenType.GT, ">", startLine, startColumn);
+    }
+
+    if (char === "<") {
+      this.advance();
+      if (this.currentChar() === "=") {
+        this.advance();
+        return new Token(TokenType.LTE, "<=", startLine, startColumn);
+      }
+      return new Token(TokenType.LT, "<", startLine, startColumn);
+    }
+
+    if (char === "!") {
+      this.advance();
+      if (this.currentChar() === "=") {
+        this.advance();
+        return new Token(TokenType.NEQ, "!=", startLine, startColumn);
+      }
+      throw new Error(`[Baris ${startLine}, Kolom ${startColumn}] Karakter tidak dikenal: !`);
     }
 
     if (/[0-9]/.test(char)) {
-      return this.readNumber();
+        return this.readNumber();
     }
 
     if (char === "+") {
       this.advance();
-      return new Token(TokenType.PLUS, "+");
+      return new Token(TokenType.PLUS, "+", startLine, startColumn);
     }
 
-    throw new Error(`Karakter tidak dikenal: ${char}`);
+    throw new Error(`[Baris ${startLine}, Kolom ${startColumn}] Karakter tidak dikenal: ${char}`);
   }
 
-  // Tokenize the entire input into an array of tokens.
   tokenize() {
     const tokens = [];
+
     let token = this.getNextToken();
 
     while (token.type !== TokenType.EOF) {
@@ -145,6 +188,7 @@ class Lexer {
     }
 
     tokens.push(token);
+
     return tokens;
   }
 }

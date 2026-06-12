@@ -4,11 +4,19 @@
 const TokenType = {
   // Keywords / statements
   PRINT: "PRINT",
+  IF: "IF",
+  THEN: "THEN",
+  ELSE: "ELSE",
 
   // Declarations / types
   CREATE: "CREATE",
   TEXT_TYPE: "TEXT_TYPE",
   NUMBER_TYPE: "NUMBER_TYPE",
+
+  // Boolean
+  BOOLEAN_TYPE: "BOOLEAN_TYPE",
+  TRUE: "TRUE",
+  FALSE: "FALSE",
 
   // Literals and identifiers
   IDENTIFIER: "IDENTIFIER",
@@ -18,6 +26,12 @@ const TokenType = {
   // Operators / punctuation
   EQUALS: "EQUALS",
   PLUS: "PLUS",
+  GT: "GT",
+  LT: "LT",
+  GTE: "GTE",
+  LTE: "LTE",
+  EQ: "EQ",
+  NEQ: "NEQ",
 
   // End of file
   EOF: "EOF",

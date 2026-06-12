@@ -1,0 +1,14 @@
+buat angka umur = 32
+
+jika umur > 18 maka
+    tampilkan "Dewasa"
+
+jika umur < 18 maka
+    tampilkan "Anak-anak"
+selain
+    tampilkan "Bukan anak-anak"
+
+buat boolean premium = benar
+
+jika premium == benar maka
+    tampilkan "Akun Premium Aktif"

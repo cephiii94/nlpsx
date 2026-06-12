@@ -1,0 +1,21 @@
+[2026-06-12 14:50:00] SPRINT 1 - IMPLEMENTASI PERCABANGAN & BOOLEAN
+- Menambahkan TokenType baru di src/lexer/token.js: IF, THEN, ELSE, TRUE, FALSE, GT, LT, GTE, LTE, EQ, NEQ.
+- Memperbarui src/lexer/lexer.js: Menambahkan logika untuk kata kunci 'jika', 'maka', 'selain', 'benar', 'salah' di readWord(), serta operator perbandingan di getNextToken().
+- Memperbarui src/parser/parser.js: Menambahkan parsing literal boolean di parseExpression(), parseVariableDeclaration() dengan BOOLEAN_TYPE, dan implementasi parseIfStatement() untuk parse struktur percabangan.
+- Memperbarui src/interpreter/interpreter.js: Menambahkan evaluasi ekspresi biner perbandingan, literal boolean, dan penanganan percabangan IfStatement.
+- Membuat berkas contoh examples/kondisi.nlpsx untuk pengujian percabangan.
+- Memperbarui docs/roadmap-current.md dan docs/roadmap-global.md.
+
+[2026-06-12 14:57:00] SPRINT 2 (REFACTORING) - WHITESPACE, SISTEM EROR & UNIT TESTING
+- Memperbarui src/lexer/lexer.js:
+  * Memperbaiki advance() agar mendeteksi '\n' lalu menaikkan baris (line) dan mereset kolom (column).
+  * Menyimpan koordinat baris/kolom awal di readWord(), readNumber(), readString(), dan getNextToken().
+- Memperbarui src/parser/parser.js:
+  * Menyimpan properti 'line' dan 'column' pada seluruh AST nodes (VariableDeclaration, PrintStatement, BinaryExpression, IfStatement).
+  * Memperbaiki consume() dan parsing-methods agar melempar Error Sintaks yang informatif beserta koordinat baris dan kolom.
+- Memperbarui src/interpreter/interpreter.js:
+  * Menambahkan parameter outputFn pada constructor (default console.log) untuk kebutuhan penangkapan keluaran di unit test.
+  * Melempar Error Runtime yang informatif dengan melampirkan info baris dan kolom dari AST node yang bersangkutan.
+- Memperbarui src/main.js: Menambahkan kemampuan membaca berkas input dari argumen CLI (argv).
+- Membuat berkas unit test baru di tests/run_tests.js untuk menguji kasus sukses dan kasus eror secara otomatis.
+- Hasil Uji: 6/6 test cases lolos dengan sukses.
