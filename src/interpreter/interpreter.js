@@ -2,19 +2,116 @@
 // Very small interpreter for the NLPSX AST. Executes variable declarations,
 // print statements and evaluates simple expressions (currently only +).
 
+class ReturnSignal extends Error {
+  constructor(value, line) {
+    super();
+    this.value = value;
+    this.line = line;
+  }
+}
+
 class Interpreter {
   constructor(ast, outputFn = console.log) {
     this.ast = ast;
-    // runtime variable storage: name -> value
-    this.variables = {};
+    // runtime scope stack: array of scope objects (from global to local)
+    this.scopes = [{}];
+    this.functions = {};
     this.output = outputFn;
+  }
+
+  // Getter for variables pointing to global scope for backwards compatibility
+  get variables() {
+    return this.scopes[0];
+  }
+
+  declareVariable(name, value) {
+    const currentScope = this.scopes[this.scopes.length - 1];
+    currentScope[name] = value;
+  }
+
+  assignVariable(name, value, line) {
+    for (let i = this.scopes.length - 1; i >= 0; i--) {
+      if (name in this.scopes[i]) {
+        this.scopes[i][name] = value;
+        return;
+      }
+    }
+    throw new Error(`Error Runtime [Baris ${line}]: Variabel "${name}" belum dibuat. Silakan buat terlebih dahulu menggunakan "buat".`);
+  }
+
+  getVariable(name, line) {
+    for (let i = this.scopes.length - 1; i >= 0; i--) {
+      if (name in this.scopes[i]) {
+        return this.scopes[i][name];
+      }
+    }
+    throw new Error(`Error Runtime [Baris ${line}]: Variabel "${name}" belum dibuat. Silakan buat terlebih dahulu menggunakan "buat".`);
   }
 
   // Execute every top-level statement in the program AST.
   run() {
-    for (const node of this.ast.body) {
-      this.execute(node);
+    try {
+      for (const node of this.ast.body) {
+        this.execute(node);
+      }
+    } catch (err) {
+      if (err instanceof ReturnSignal) {
+        throw new Error(`Error Runtime [Baris ${err.line}]: Perintah "kembalikan" hanya dapat ditulis di dalam fungsi.`);
+      }
+      throw err;
     }
+  }
+
+  executeFunctionCall(node) {
+    const func = this.functions[node.name];
+    if (!func) {
+      throw new Error(`Error Runtime [Baris ${node.line}]: Fungsi "${node.name}" belum dibuat. Silakan buat fungsi ini terlebih dahulu menggunakan perintah: fungsi ${node.name}(...)`);
+    }
+
+    if (node.args.length !== func.params.length) {
+      throw new Error(`Error Runtime [Baris ${node.line}]: Fungsi "${node.name}" mengharapkan ${func.params.length} argumen, tetapi mendapatkan ${node.args.length}.`);
+    }
+
+    // Evaluate arguments in the current scope BEFORE pushing the new function scope
+    const evaluatedArgs = [];
+    for (let i = 0; i < node.args.length; i++) {
+      const argValue = this.evaluate(node.args[i]);
+      const param = func.params[i];
+
+      // Parameter type safety check
+      if (param.type === "angka" && typeof argValue !== "number") {
+        throw new Error(`Error Runtime [Baris ${node.line}]: Argumen ke-${i + 1} tidak cocok. Fungsi "${node.name}" mengharapkan parameter "${param.name}" bernilai tipe "angka", tetapi Anda memberikan tipe "${typeof argValue}" (${JSON.stringify(argValue)}).`);
+      }
+      if (param.type === "teks" && typeof argValue !== "string") {
+        throw new Error(`Error Runtime [Baris ${node.line}]: Argumen ke-${i + 1} tidak cocok. Fungsi "${node.name}" mengharapkan parameter "${param.name}" bernilai tipe "teks", tetapi Anda memberikan tipe "${typeof argValue}" (${JSON.stringify(argValue)}).`);
+      }
+      if (param.type === "boolean" && typeof argValue !== "boolean") {
+        throw new Error(`Error Runtime [Baris ${node.line}]: Argumen ke-${i + 1} tidak cocok. Fungsi "${node.name}" mengharapkan parameter "${param.name}" bernilai tipe "boolean", tetapi Anda memberikan tipe "${typeof argValue}" (${JSON.stringify(argValue)}).`);
+      }
+
+      evaluatedArgs.push({ name: param.name, value: argValue });
+    }
+
+    // Push new function scope
+    const newScope = {};
+    for (const arg of evaluatedArgs) {
+      newScope[arg.name] = arg.value;
+    }
+    this.scopes.push(newScope);
+
+    try {
+      this.execute(func.body);
+    } catch (err) {
+      if (err instanceof ReturnSignal) {
+        return err.value;
+      }
+      throw err;
+    } finally {
+      // Pop the scope to restore execution environment
+      this.scopes.pop();
+    }
+
+    return null;
   }
 
   // Execute a single AST node.
@@ -33,21 +130,13 @@ class Interpreter {
         throw new Error(`Error Runtime [Baris ${node.line}]: Tipe data tidak cocok. Variabel "${node.name}" dideklarasikan sebagai "boolean", tetapi Anda mengisinya dengan tipe "${typeof val}" (${JSON.stringify(val)}).`);
       }
 
-      this.variables[node.name] = val;
+      this.declareVariable(node.name, val);
       return;
     }
 
     if (node.type === "PrintStatement") {
-      // Print either a literal string or the value of an identifier.
-      if (node.valueType === "identifier") {
-        if (!(node.value in this.variables)) {
-          throw new Error(`Error Runtime [Baris ${node.line}]: Variabel "${node.value}" belum dibuat. Silakan deklarasikan variabel ini terlebih dahulu menggunakan perintah: buat <tipe> ${node.value} = <nilai>`);
-        }
-        this.output(this.variables[node.value]);
-        return;
-      }
-
-      this.output(node.value);
+      const val = this.evaluate(node.value);
+      this.output(val);
       return;
     }
 
@@ -59,6 +148,51 @@ class Interpreter {
         this.execute(node.alternate);
       }
       return;
+    }
+
+    if (node.type === "BlockStatement") {
+      for (const statement of node.body) {
+        this.execute(statement);
+      }
+      return;
+    }
+
+    if (node.type === "LoopStatement") {
+      while (this.evaluate(node.condition)) {
+        this.execute(node.body);
+      }
+      return;
+    }
+
+    if (node.type === "VariableAssignment") {
+      const existingVal = this.getVariable(node.name, node.line);
+      const val = this.evaluate(node.value);
+      
+      let expectedTypeLabel = "";
+      if (typeof existingVal === "number") expectedTypeLabel = "angka";
+      else if (typeof existingVal === "string") expectedTypeLabel = "teks";
+      else if (typeof existingVal === "boolean") expectedTypeLabel = "boolean";
+
+      if (typeof val !== typeof existingVal) {
+        throw new Error(`Error Runtime [Baris ${node.line}]: Tipe data tidak cocok. Variabel "${node.name}" dideklarasikan sebagai "${expectedTypeLabel}", tetapi Anda mengisinya dengan tipe "${typeof val}" (${JSON.stringify(val)}).`);
+      }
+      this.assignVariable(node.name, val, node.line);
+      return;
+    }
+
+    if (node.type === "FunctionDeclaration") {
+      this.functions[node.name] = node;
+      return;
+    }
+
+    if (node.type === "FunctionCallStatement") {
+      this.executeFunctionCall(node);
+      return;
+    }
+
+    if (node.type === "ReturnStatement") {
+      const val = node.value ? this.evaluate(node.value) : null;
+      throw new ReturnSignal(val, node.line);
     }
 
     throw new Error(`Error Runtime [Baris ${node.line}]: Node pernyataan tipe "${node.type}" tidak dikenal.`);
@@ -75,10 +209,11 @@ class Interpreter {
     }
 
     if (node.type === "IDENTIFIER") {
-      if (!(node.value in this.variables)) {
-        throw new Error(`Error Runtime [Baris ${node.line}]: Variabel "${node.value}" belum dibuat. Silakan deklarasikan variabel ini terlebih dahulu menggunakan perintah: buat <tipe> ${node.value} = <nilai>`);
-      }
-      return this.variables[node.value];
+      return this.getVariable(node.value, node.line);
+    }
+
+    if (node.type === "FunctionCallExpression") {
+      return this.executeFunctionCall(node);
     }
 
     if (node.type === "UnaryExpression") {

@@ -5,7 +5,7 @@ jika umur > 18 maka
 
 jika umur < 18 maka
     tampilkan "Anak-anak"
-selain
+jika tidak
     tampilkan "Bukan anak-anak"
 
 buat boolean premium = benar

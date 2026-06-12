@@ -14,3 +14,21 @@ buat angka total = a + b
 
 tampilkan total
 
+buat angka i = 1
+selama i <= 5 lakukan
+{
+    tampilkan i
+    i = i + 3
+}
+
+fungsi perkenalkan(teks nama, teks umur)
+{
+    tampilkan "Halo, nama saya " + nama
+    tampilkan "Umur saya " + umur + " tahun."
+}
+
+buat teks namaSaya = "Budi"
+buat teks umurSaya = "17"
+
+perkenalkan(namaSaya, umurSaya)
+

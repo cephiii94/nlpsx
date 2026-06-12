@@ -1,0 +1,6 @@
+buat angka i = 1
+selama i <= 5 lakukan
+{
+    tampilkan i
+    i = i + 1
+}

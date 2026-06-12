@@ -24,10 +24,10 @@ Features:
 Features:
 
 * [x] Else Statement
-* [ ] Loop
-* [ ] Function
-* [ ] Return
-* [ ] Scope
+* [x] Loop
+* [x] Function
+* [x] Return
+* [x] Scope
 
 ---
 

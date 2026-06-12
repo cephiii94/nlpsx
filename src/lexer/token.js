@@ -7,6 +7,15 @@ const TokenType = {
   IF: "IF",
   THEN: "THEN",
   ELSE: "ELSE",
+  WHILE: "WHILE",
+  DO: "DO",
+  LBRACE: "LBRACE",
+  RBRACE: "RBRACE",
+  FUNCTION: "FUNCTION",
+  LPAREN: "LPAREN",
+  RPAREN: "RPAREN",
+  COMMA: "COMMA",
+  RETURN: "RETURN",
 
   // Declarations / types
   CREATE: "CREATE",

@@ -76,18 +76,18 @@ Digunakan untuk mengevaluasi perbandingan antara dua nilai. Menghasilkan nilai `
 
 ## 3. Struktur Kontrol Percabangan (Kondisi)
 
-Mendukung pengambilan keputusan menggunakan pernyataan `jika ... maka` dengan opsi percabangan alternatif `selain`:
+Mendukung pengambilan keputusan menggunakan pernyataan `jika ... maka` dengan opsi percabangan alternatif `jika tidak`:
 
 *   **Sintaks `jika ... maka` tunggal**:
     ```nlpsx
     jika umur > 18 maka
         tampilkan "Akses diberikan."
     ```
-*   **Sintaks `jika ... maka ... selain`**:
+*   **Sintaks `jika ... maka ... jika tidak`**:
     ```nlpsx
     jika level > 50 maka
         tampilkan "Tingkat Tinggi"
-    selain
+    jika tidak
         tampilkan "Tingkat Pemula"
     ```
 
@@ -108,7 +108,80 @@ Pernyataan untuk mencetak teks atau nilai variabel ke terminal menggunakan perin
 
 ---
 
-## 5. Fitur Keamanan & Validasi (Quality of Life)
+## 5. Struktur Kontrol Perulangan (Loop) & Re-assignment
+
+### A. Perulangan `selama ... lakukan`
+Digunakan untuk mengeksekusi blok kode berulang kali selama kondisi bernilai `benar`. Blok pernyataan dibatasi oleh karakter `{` dan `}`:
+*   **Contoh**:
+    ```nlpsx
+    buat angka i = 1
+    selama i <= 5 lakukan
+    {
+        tampilkan i
+        i = i + 1
+    }
+    ```
+
+### B. Pemberian Nilai Baru (Re-assignment)
+Mengubah nilai variabel yang sudah dideklarasikan sebelumnya tanpa kata kunci `buat`. Tipe data dari nilai baru harus sesuai dengan tipe data saat deklarasi awal untuk menjaga keamanan tipe data (*type safety*):
+*   **Contoh**:
+    ```nlpsx
+    buat angka skor = 0
+    skor = 10  # Valid
+    # skor = "sepuluh"  -> Akan memicu eror runtime tipe data tidak cocok
+    ```
+
+---
+
+## 6. Fungsi (Function) & Scope Stack
+
+### A. Deklarasi Fungsi `fungsi`
+Fungsi dideklarasikan menggunakan kata kunci `fungsi`, diikuti dengan nama fungsi, parameter terikat tipe, dan tubuh pernyataan (dapat berupa satu baris atau dibatasi kurung kurawal `{ ... }`):
+*   **Contoh**:
+    ```nlpsx
+    fungsi perkenalkan(teks nama, teks umur)
+    {
+        tampilkan "Halo, saya " + nama
+        tampilkan "Umur saya " + umur + " tahun."
+    }
+    ```
+
+### B. Pemanggilan Fungsi & Validasi Argumen
+Fungsi dipanggil dengan tanda kurung `()`. Setiap argumen yang dilewatkan ke fungsi akan dievaluasi dan divalidasi tipenya secara ketat sesuai dengan tipe data parameter yang dideklarasikan:
+*   **Contoh**:
+    ```nlpsx
+    perkenalkan("Budi", "17")  # Valid
+    # perkenalkan("Budi", 17)  -> Eror Runtime: tipe data argumen kedua tidak cocok (diharapkan teks, didapatkan angka)
+    ```
+
+### C. Isolasi Ruang Lingkup (Scope Stack)
+NLPSX mengadopsi struktur *Scope Stack* untuk mengisolasi variabel lokal fungsi. Parameter fungsi dan variabel yang dibuat di dalam fungsi tidak akan memengaruhi atau menimpa variabel global dengan nama yang sama:
+*   **Contoh**:
+    ```nlpsx
+    buat teks nama = "Global"
+    fungsi ubah(teks nama)
+    {
+        tampilkan nama  # Mencetak "Lokal"
+    }
+    ubah("Lokal")
+    tampilkan nama  # Mencetak "Global" (tidak berubah)
+    ```
+
+### D. Pengembalian Nilai (`kembalikan`)
+Fungsi dapat mengembalikan nilai ke pemanggil menggunakan pernyataan `kembalikan <ekspresi>`. Eksekusi fungsi akan langsung dihentikan setelah pernyataan `kembalikan` dievaluasi (*early return*):
+*   **Contoh**:
+    ```nlpsx
+    fungsi kuadrat(angka x)
+    {
+        kembalikan x * x
+    }
+    buat angka hasil = kuadrat(5)
+    tampilkan hasil  # Mencetak 25
+    ```
+
+---
+
+## 7. Fitur Keamanan & Validasi (Quality of Life)
 
 ### A. Validasi Tipe Data Runtime (*Type Safety*)
 Interpreter NLPSX melakukan pengecekan tipe data yang ketat saat runtime. Jika tipe data deklarasi tidak sesuai dengan nilai evaluasi, program akan langsung berhenti dan melempar eror:

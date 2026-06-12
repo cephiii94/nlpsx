@@ -1,0 +1,11 @@
+fungsi perkenalkan(teks nama, teks umur)
+{
+    tampilkan "Halo, nama saya " + nama
+    tampilkan "Umur saya " + umur + " tahun."
+}
+
+buat teks namaSaya = "Budi"
+buat teks umurSaya = "17"
+
+perkenalkan(namaSaya, umurSaya)
+

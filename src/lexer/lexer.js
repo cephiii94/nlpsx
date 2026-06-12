@@ -63,9 +63,37 @@ class Lexer {
     else if (word === "boolean") type = TokenType.BOOLEAN_TYPE;
     else if (word === "benar") { type = TokenType.TRUE; value = true; }
     else if (word === "salah") { type = TokenType.FALSE; value = false; }
-    else if (word === "jika") type = TokenType.IF;
+    else if (word === "jika") {
+      const savedPos = this.position;
+      const savedLine = this.line;
+      const savedColumn = this.column;
+
+      this.skipWhitespace();
+
+      let nextWord = "";
+      while (
+          this.currentChar() !== null &&
+          /[a-zA-Z_]/.test(this.currentChar())
+      ) {
+          nextWord += this.advance();
+      }
+
+      if (nextWord === "tidak") {
+        type = TokenType.ELSE;
+        value = "jika tidak";
+      } else {
+        this.position = savedPos;
+        this.line = savedLine;
+        this.column = savedColumn;
+        type = TokenType.IF;
+        value = "jika";
+      }
+    }
     else if (word === "maka") type = TokenType.THEN;
-    else if (word === "selain") type = TokenType.ELSE;
+    else if (word === "selama") type = TokenType.WHILE;
+    else if (word === "lakukan") type = TokenType.DO;
+    else if (word === "fungsi") type = TokenType.FUNCTION;
+    else if (word === "kembalikan") type = TokenType.RETURN;
 
     return new Token(type, value, startLine, startColumn);
   }
@@ -216,6 +244,31 @@ class Lexer {
     if (char === "/") {
       this.advance();
       return new Token(TokenType.SLASH, "/", startLine, startColumn);
+    }
+
+    if (char === "{") {
+      this.advance();
+      return new Token(TokenType.LBRACE, "{", startLine, startColumn);
+    }
+
+    if (char === "}") {
+      this.advance();
+      return new Token(TokenType.RBRACE, "}", startLine, startColumn);
+    }
+
+    if (char === "(") {
+      this.advance();
+      return new Token(TokenType.LPAREN, "(", startLine, startColumn);
+    }
+
+    if (char === ")") {
+      this.advance();
+      return new Token(TokenType.RPAREN, ")", startLine, startColumn);
+    }
+
+    if (char === ",") {
+      this.advance();
+      return new Token(TokenType.COMMA, ",", startLine, startColumn);
     }
 
     throw new Error(`Error Sintaks [Baris ${startLine}, Kolom ${startColumn}]: Karakter "${char}" tidak dikenal dalam bahasa NLPSX.`);

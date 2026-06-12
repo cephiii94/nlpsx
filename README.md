@@ -64,7 +64,7 @@ Output
 
 Berikut adalah beberapa fitur utama yang membedakan NLPSX dari bahasa pemrograman lainnya, khususnya bagi pemula:
 
-1.  **Sintaksis Natural & Identitas Lokal**: Ditulis menggunakan Bahasa Indonesia yang mendekatkan logika pemrograman ke bahasa sehari-hari manusia (contoh: `buat`, `tampilkan`, `jika`, `maka`, `selain`).
+1.  **Sintaksis Natural & Identitas Lokal**: Ditulis menggunakan Bahasa Indonesia yang mendekatkan logika pemrograman ke bahasa sehari-hari manusia (contoh: `buat`, `tampilkan`, `jika`, `maka`, `jika tidak`).
 2.  **Keamanan Tipe Data Alami (*Type-Safe by Default*)**: Menerapkan pengecekan tipe data variabel yang ketat (`angka`, `teks`, `boolean`) saat runtime, melatih kebiasaan penulisan kode yang aman dan minim bug.
 3.  **Pesan Kesalahan Ramah Pemula (*Friendly Error*)**: Setiap kesalahan penulisan kode disajikan dengan kalimat bahasa manusia yang santun, informatif, lengkap dengan koordinat baris/kolom, serta saran/tips cara memperbaikinya.
 4.  **Dukungan Desimal & Escape Character**: Memiliki lexer cerdas yang langsung mengenali bilangan desimal pecahan, angka uner negatif, serta pemrosesan escape characters (`\n`, `\t`, `\"`) pada teks.

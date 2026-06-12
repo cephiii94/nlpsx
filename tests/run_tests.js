@@ -31,12 +31,12 @@ const tests = [
     expected: ["Dewasa"],
   },
   {
-    name: "Kondisi jika-maka Salah dengan Selain",
+    name: "Kondisi jika-maka Salah dengan Jika Tidak",
     code: `
       buat angka umur = 10
       jika umur > 18 maka
           tampilkan "Dewasa"
-      selain
+      jika tidak
           tampilkan "Anak-anak"
     `,
     expected: ["Anak-anak"],
@@ -94,6 +94,162 @@ const tests = [
       buat boolean var_salah = 12
     `,
     expectedError: "Error Runtime [Baris 2]: Tipe data tidak cocok. Variabel \"var_salah\" dideklarasikan sebagai \"boolean\", tetapi Anda mengisinya dengan tipe \"number\"",
+  },
+  {
+    name: "Perulangan Dasar",
+    code: `
+      buat angka i = 1
+      selama i <= 3 lakukan
+      {
+          tampilkan i
+          i = i + 1
+      }
+    `,
+    expected: [1, 2, 3],
+  },
+  {
+    name: "Error Runtime: Re-assignment Tipe Data Tidak Cocok",
+    code: `
+      buat angka i = 1
+      i = "salah"
+    `,
+    expectedError: "Error Runtime [Baris 3]: Tipe data tidak cocok. Variabel \"i\" dideklarasikan sebagai \"angka\", tetapi Anda mengisinya dengan tipe \"string\"",
+  },
+  {
+    name: "Error Runtime: Re-assignment Variabel Belum Dibuat",
+    code: `
+      x = 5
+    `,
+    expectedError: "Error Runtime [Baris 2]: Variabel \"x\" belum dibuat. Silakan buat terlebih dahulu menggunakan \"buat\"",
+  },
+  {
+    name: "Error Sintaks: Kurang Keyword lakukan",
+    code: `
+      buat angka i = 1
+      selama i <= 5
+          tampilkan i
+    `,
+    expectedError: "Tips: Anda menulis pernyataan perulangan \"selama\" tetapi lupa menulis kata kunci \"lakukan\" setelah kondisi",
+  },
+  {
+    name: "Error Sintaks: Blok Kurang Tutup Kurawal",
+    code: `
+      buat angka i = 1
+      selama i <= 5 lakukan
+      {
+          tampilkan i
+          i = i + 1
+    `,
+    expectedError: "Tips: Pastikan Anda menutup blok perulangan/kondisi dengan kurung kurawal tutup \"}\"",
+  },
+  {
+    name: "Error Sintaks: Kurang Kondisi Perulangan",
+    code: `
+      selama lakukan
+          tampilkan 1
+    `,
+    expectedError: "Tips: Anda menulis \"selama\" diikuti langsung oleh \"lakukan\". Pastikan Anda menulis kondisi perulangan (seperti \"i <= 5\") di antara keduanya",
+  },
+  {
+    name: "Fungsi Tanpa Parameter",
+    code: `
+      fungsi halo()
+      {
+          tampilkan "Halo Dunia!"
+      }
+      halo()
+    `,
+    expected: ["Halo Dunia!"],
+  },
+  {
+    name: "Fungsi Dengan Parameter",
+    code: `
+      fungsi tambah(angka a, angka b)
+      {
+          tampilkan a + b
+      }
+      tambah(10, 20)
+    `,
+    expected: [30],
+  },
+  {
+    name: "Fungsi Scope Isolation",
+    code: `
+      buat teks nama = "Global"
+      fungsi ubah(teks nama)
+      {
+          tampilkan nama
+      }
+      ubah("Lokal")
+      tampilkan nama
+    `,
+    expected: ["Lokal", "Global"],
+  },
+  {
+    name: "Error Runtime: Fungsi Parameter Type Mismatch",
+    code: `
+      fungsi angkaSaja(angka x)
+      {
+          tampilkan x
+      }
+      angkaSaja("salah")
+    `,
+    expectedError: "Argumen ke-1 tidak cocok. Fungsi \"angkaSaja\" mengharapkan parameter \"x\" bernilai tipe \"angka\", tetapi Anda memberikan tipe \"string\"",
+  },
+  {
+    name: "Fungsi Kembalikan Nilai",
+    code: `
+      fungsi jumlah(angka a, angka b)
+      {
+          kembalikan a + b
+      }
+      buat angka hasil = jumlah(100, 200)
+      tampilkan hasil
+    `,
+    expected: [300],
+  },
+  {
+    name: "Fungsi Early Return",
+    code: `
+      fungsi cekPositif(angka x)
+      {
+          jika x < 0 maka
+          {
+              tampilkan "Negatif"
+              kembalikan "Selesai"
+          }
+          tampilkan "Positif"
+          kembalikan "Selesai"
+      }
+      cekPositif(-5)
+      cekPositif(10)
+    `,
+    expected: ["Negatif", "Positif"],
+  },
+  {
+    name: "Fungsi Kembalikan Ekspresi Kompleks",
+    code: `
+      fungsi gabung(teks teksA, teks teksB)
+      {
+          kembalikan teksA + " " + teksB
+      }
+      tampilkan gabung("Halo", "Dunia")
+    `,
+    expected: ["Halo Dunia"],
+  },
+  {
+    name: "Error Runtime: Fungsi Belum Dibuat",
+    code: `
+      panggilFungsiGaib()
+    `,
+    expectedError: "Error Runtime [Baris 2]: Fungsi \"panggilFungsiGaib\" belum dibuat. Silakan buat fungsi ini terlebih dahulu menggunakan perintah: fungsi panggilFungsiGaib(...)",
+  },
+  {
+    name: "Error Runtime: Return Di Luar Fungsi",
+    code: `
+      kembalikan 10
+    `,
+    expectedError: "Error Runtime [Baris 2]: Perintah \"kembalikan\" hanya dapat ditulis di dalam fungsi.",
   }
 ];
 

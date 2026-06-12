@@ -42,13 +42,23 @@ tampilkan
 ```text
 jika
 maka
-selain
+jika tidak
 ```
 
 ### Perulangan
 
 ```text
-ulang
+selama
+lakukan
+{
+}
+```
+
+### Fungsi
+
+```text
+fungsi
+kembalikan
 ```
 
 ---
@@ -178,8 +188,35 @@ jika umur >= 18 maka
 ```nlpsx
 jika umur >= 18 maka
     tampilkan "Dewasa"
-selain
+jika tidak
     tampilkan "Anak-anak"
+```
+
+---
+
+## Perulangan
+
+```nlpsx
+buat angka i = 1
+selama i <= 5 lakukan
+{
+    tampilkan i
+    i = i + 1
+}
+```
+
+---
+
+## Fungsi & Kembalikan
+
+```nlpsx
+fungsi tambah(angka a, angka b)
+{
+    kembalikan a + b
+}
+
+buat angka hasil = tambah(5, 10)
+tampilkan hasil
 ```
 
 ---
