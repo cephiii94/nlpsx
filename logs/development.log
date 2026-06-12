@@ -57,7 +57,22 @@
 [2026-06-12 15:58:00] REVISI ROADMAP GLOBAL
 - Memperbarui docs/roadmap-global.md untuk menandai Else Statement sebagai [x] (selesai), Error System sebagai [x] (selesai v1), dan NLPSX CLI sebagai [/] (selesai sebagian untuk basic runner).
 
-
-
-
-
+[2026-06-13 02:36:00] SPRINT 5 - DESAIN ULANG SINTAKSIS ALAMI (ADALAH & SELESAI)
+- Memperbarui src/lexer/token.js:
+  * Menghapus TokenType.CREATE (buat) dan menambahkan TokenType.IS (adalah) serta TokenType.SELESAI (selesai).
+- Memperbarui src/lexer/lexer.js:
+  * Memperbarui readWord() untuk memetakan kata 'adalah' ke TokenType.IS dan kata 'selesai' ke TokenType.SELESAI. Menghapus keyword 'buat'.
+- Memperbarui src/parser/parser.js:
+  * Mengubah parseVariableDeclaration() untuk memproses inisialisasi variabel dengan format: <tipe_data> <nama> adalah <nilai>.
+  * Mengubah parseIfStatement() untuk memproses blok consequent dan alternate yang ditutup menggunakan kata kunci 'selesai'.
+  * Mengubah parseLoopStatement() dan parseFunctionDeclaration() agar tubuh blok ditutup menggunakan kata kunci 'selesai' melalui fungsi bantu parseBlock().
+  * Menyesuaikan parseStatement() agar mendeteksi tipe data (teks, angka, boolean) secara langsung untuk memulai deklarasi variabel.
+- Memperbarui src/interpreter/interpreter.js:
+  * Menyesuaikan pesan kesalahan runtime tentang variabel belum dideklarasikan agar mengarahkan pengguna untuk mendeklarasikan menggunakan kata kunci 'adalah'.
+- Memperbarui tests/run_tests.js:
+  * Menulis ulang seluruh 26 skenario pengujian dengan sintaks baru (menggunakan 'adalah' dan 'selesai') dan menyesuaikan asersi kesalahan.
+  * Hasil Uji: 26/26 pengujian berhasil dilewati.
+- Memperbarui dokumentasi di docs/fitur-bahasa.md dan docs/language-spec-v0.1.md agar selaras dengan spesifikasi sintaksis baru.
+- Menambahkan dukungan pemisah opsional titik koma (TokenType.SEMICOLON `;`) di Lexer, Parser, dan Tests (27/27 pengujian berhasil dilewati).
+- Menambahkan dukungan sinonim teks Bahasa Indonesia untuk operator perbandingan (sama dengan/adalah -> ==, bukan -> !=, lebih dari -> >, kurang dari -> <, minimal -> >=, maksimal -> <=) di Lexer, Parser, Tests, dan Dokumentasi (28/28 pengujian berhasil dilewati).
+- Menambahkan dukungan penulisan komentar satu baris menggunakan simbol `#` dan `//` di Lexer, Tests, dan Dokumentasi (29/29 pengujian berhasil dilewati).

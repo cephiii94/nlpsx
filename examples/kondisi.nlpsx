@@ -1,14 +1,17 @@
-buat angka umur = 32
+angka umur adalah 32
 
 jika umur > 18 maka
     tampilkan "Dewasa"
+selesai
 
 jika umur < 18 maka
     tampilkan "Anak-anak"
 jika tidak
     tampilkan "Bukan anak-anak"
+selesai
 
-buat boolean premium = benar
+boolean premium adalah benar
 
 jika premium == benar maka
     tampilkan "Akun Premium Aktif"
+selesai

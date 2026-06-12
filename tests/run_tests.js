@@ -6,7 +6,7 @@ const tests = [
   {
     name: "Deklarasi dan Tampilkan Teks",
     code: `
-      buat teks nama = "Budi"
+      teks nama adalah "Budi"
       tampilkan nama
     `,
     expected: ["Budi"],
@@ -14,9 +14,9 @@ const tests = [
   {
     name: "Penjumlahan Angka",
     code: `
-      buat angka a = 5
-      buat angka b = 10
-      buat angka c = a + b
+      angka a adalah 5
+      angka b adalah 10
+      angka c adalah a + b
       tampilkan c
     `,
     expected: [15],
@@ -24,20 +24,22 @@ const tests = [
   {
     name: "Kondisi jika-maka Benar",
     code: `
-      buat angka umur = 20
+      angka umur adalah 20
       jika umur > 18 maka
           tampilkan "Dewasa"
+      selesai
     `,
     expected: ["Dewasa"],
   },
   {
     name: "Kondisi jika-maka Salah dengan Jika Tidak",
     code: `
-      buat angka umur = 10
+      angka umur adalah 10
       jika umur > 18 maka
           tampilkan "Dewasa"
       jika tidak
           tampilkan "Anak-anak"
+      selesai
     `,
     expected: ["Anak-anak"],
   },
@@ -46,22 +48,23 @@ const tests = [
     code: `
       tampilkan nama_baru
     `,
-    expectedError: "Error Runtime [Baris 2]: Variabel \"nama_baru\" belum dibuat",
+    expectedError: "Error Runtime [Baris 2]: Variabel \"nama_baru\" belum dideklarasikan",
   },
   {
     name: "Error Sintaks: Kurang Keyword maka",
     code: `
       jika 5 > 3
           tampilkan "OK"
+      selesai
     `,
     expectedError: "Error Sintaks [di Baris 3, Kolom 11]: Mengharapkan simbol atau kata kunci \"THEN\"",
   },
   {
     name: "Angka Desimal & Uner Negatif",
     code: `
-      buat angka a = 3.5
-      buat angka b = -1.5
-      buat angka c = a + b
+      angka a adalah 3.5
+      angka b adalah -1.5
+      angka c adalah a + b
       tampilkan c
     `,
     expected: [2],
@@ -69,7 +72,7 @@ const tests = [
   {
     name: "String Escape Characters",
     code: `
-      buat teks s = "Halo\\t\\"Budi\\"\\nKabar Baik"
+      teks s adalah "Halo\\t\\"Budi\\"\\nKabar Baik"
       tampilkan s
     `,
     expected: ["Halo\t\"Budi\"\nKabar Baik"],
@@ -77,40 +80,39 @@ const tests = [
   {
     name: "Error Runtime: Type Mismatch Angka diisi Teks",
     code: `
-      buat angka var_salah = "Halo"
+      angka var_salah adalah "Halo"
     `,
     expectedError: "Error Runtime [Baris 2]: Tipe data tidak cocok. Variabel \"var_salah\" dideklarasikan sebagai \"angka\", tetapi Anda mengisinya dengan tipe \"string\"",
   },
   {
     name: "Error Runtime: Type Mismatch Teks diisi Boolean",
     code: `
-      buat teks var_salah = benar
+      teks var_salah adalah benar
     `,
     expectedError: "Error Runtime [Baris 2]: Tipe data tidak cocok. Variabel \"var_salah\" dideklarasikan sebagai \"teks\", tetapi Anda mengisinya dengan tipe \"boolean\"",
   },
   {
     name: "Error Runtime: Type Mismatch Boolean diisi Angka",
     code: `
-      buat boolean var_salah = 12
+      boolean var_salah adalah 12
     `,
     expectedError: "Error Runtime [Baris 2]: Tipe data tidak cocok. Variabel \"var_salah\" dideklarasikan sebagai \"boolean\", tetapi Anda mengisinya dengan tipe \"number\"",
   },
   {
     name: "Perulangan Dasar",
     code: `
-      buat angka i = 1
+      angka i adalah 1
       selama i <= 3 lakukan
-      {
           tampilkan i
           i = i + 1
-      }
+      selesai
     `,
     expected: [1, 2, 3],
   },
   {
     name: "Error Runtime: Re-assignment Tipe Data Tidak Cocok",
     code: `
-      buat angka i = 1
+      angka i adalah 1
       i = "salah"
     `,
     expectedError: "Error Runtime [Baris 3]: Tipe data tidak cocok. Variabel \"i\" dideklarasikan sebagai \"angka\", tetapi Anda mengisinya dengan tipe \"string\"",
@@ -120,33 +122,34 @@ const tests = [
     code: `
       x = 5
     `,
-    expectedError: "Error Runtime [Baris 2]: Variabel \"x\" belum dibuat. Silakan buat terlebih dahulu menggunakan \"buat\"",
+    expectedError: "Error Runtime [Baris 2]: Variabel \"x\" belum dideklarasikan. Silakan deklarasikan terlebih dahulu menggunakan kata kunci \"adalah\"",
   },
   {
     name: "Error Sintaks: Kurang Keyword lakukan",
     code: `
-      buat angka i = 1
+      angka i adalah 1
       selama i <= 5
           tampilkan i
+      selesai
     `,
     expectedError: "Tips: Anda menulis pernyataan perulangan \"selama\" tetapi lupa menulis kata kunci \"lakukan\" setelah kondisi",
   },
   {
-    name: "Error Sintaks: Blok Kurang Tutup Kurawal",
+    name: "Error Sintaks: Blok Kurang Tutup Selesai",
     code: `
-      buat angka i = 1
+      angka i adalah 1
       selama i <= 5 lakukan
-      {
           tampilkan i
           i = i + 1
     `,
-    expectedError: "Tips: Pastikan Anda menutup blok perulangan/kondisi dengan kurung kurawal tutup \"}\"",
+    expectedError: "Tips: Pastikan Anda menutup blok perulangan/kondisi/fungsi dengan kata penutup \"selesai\"",
   },
   {
     name: "Error Sintaks: Kurang Kondisi Perulangan",
     code: `
       selama lakukan
           tampilkan 1
+      selesai
     `,
     expectedError: "Tips: Anda menulis \"selama\" diikuti langsung oleh \"lakukan\". Pastikan Anda menulis kondisi perulangan (seperti \"i <= 5\") di antara keduanya",
   },
@@ -154,9 +157,8 @@ const tests = [
     name: "Fungsi Tanpa Parameter",
     code: `
       fungsi halo()
-      {
           tampilkan "Halo Dunia!"
-      }
+      selesai
       halo()
     `,
     expected: ["Halo Dunia!"],
@@ -165,9 +167,8 @@ const tests = [
     name: "Fungsi Dengan Parameter",
     code: `
       fungsi tambah(angka a, angka b)
-      {
           tampilkan a + b
-      }
+      selesai
       tambah(10, 20)
     `,
     expected: [30],
@@ -175,11 +176,10 @@ const tests = [
   {
     name: "Fungsi Scope Isolation",
     code: `
-      buat teks nama = "Global"
+      teks nama adalah "Global"
       fungsi ubah(teks nama)
-      {
           tampilkan nama
-      }
+      selesai
       ubah("Lokal")
       tampilkan nama
     `,
@@ -189,9 +189,8 @@ const tests = [
     name: "Error Runtime: Fungsi Parameter Type Mismatch",
     code: `
       fungsi angkaSaja(angka x)
-      {
           tampilkan x
-      }
+      selesai
       angkaSaja("salah")
     `,
     expectedError: "Argumen ke-1 tidak cocok. Fungsi \"angkaSaja\" mengharapkan parameter \"x\" bernilai tipe \"angka\", tetapi Anda memberikan tipe \"string\"",
@@ -200,10 +199,9 @@ const tests = [
     name: "Fungsi Kembalikan Nilai",
     code: `
       fungsi jumlah(angka a, angka b)
-      {
           kembalikan a + b
-      }
-      buat angka hasil = jumlah(100, 200)
+      selesai
+      angka hasil adalah jumlah(100, 200)
       tampilkan hasil
     `,
     expected: [300],
@@ -212,15 +210,13 @@ const tests = [
     name: "Fungsi Early Return",
     code: `
       fungsi cekPositif(angka x)
-      {
           jika x < 0 maka
-          {
               tampilkan "Negatif"
               kembalikan "Selesai"
-          }
+          selesai
           tampilkan "Positif"
           kembalikan "Selesai"
-      }
+      selesai
       cekPositif(-5)
       cekPositif(10)
     `,
@@ -230,9 +226,8 @@ const tests = [
     name: "Fungsi Kembalikan Ekspresi Kompleks",
     code: `
       fungsi gabung(teks teksA, teks teksB)
-      {
           kembalikan teksA + " " + teksB
-      }
+      selesai
       tampilkan gabung("Halo", "Dunia")
     `,
     expected: ["Halo Dunia"],
@@ -250,6 +245,41 @@ const tests = [
       kembalikan 10
     `,
     expectedError: "Error Runtime [Baris 2]: Perintah \"kembalikan\" hanya dapat ditulis di dalam fungsi.",
+  },
+  {
+    name: "Pemisah Titik Koma Semicolon",
+    code: `
+      angka a adalah 5; angka b adalah 10;
+      tampilkan a + b;
+      jika a < b maka
+          tampilkan "A kurang dari B";
+      selesai;
+    `,
+    expected: [15, "A kurang dari B"],
+  },
+  {
+    name: "Sinonim Operator Perbandingan",
+    code: `
+      angka x adalah 10;
+      jika x adalah 10 maka tampilkan "adalah"; selesai
+      jika x sama dengan 10 maka tampilkan "sama dengan"; selesai
+      jika x bukan 5 maka tampilkan "bukan"; selesai
+      jika x lebih dari 5 maka tampilkan "lebih dari"; selesai
+      jika x kurang dari 15 maka tampilkan "kurang dari"; selesai
+      jika x minimal 10 maka tampilkan "minimal"; selesai
+      jika x maksimal 10 maka tampilkan "maksimal"; selesai
+    `,
+    expected: ["adalah", "sama dengan", "bukan", "lebih dari", "kurang dari", "minimal", "maksimal"],
+  },
+  {
+    name: "Penulisan Komentar (# dan //)",
+    code: `
+      # Ini adalah komentar pagar
+      angka x adalah 100 // Ini adalah komentar double slash
+      // Komentar baris penuh
+      tampilkan x
+    `,
+    expected: [100],
   }
 ];
 

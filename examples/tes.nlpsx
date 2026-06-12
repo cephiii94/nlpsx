@@ -1,5 +1,5 @@
-nama = "Cecep"
+teks nama adalah "Cecep"
 
 jika nama == "Cecep" maka
-    tampilkan("Halo Admin Gudang")
+    tampilkan "Halo Admin Gudang"
 selesai

@@ -36,8 +36,10 @@ class Parser {
         friendlyMessage += `. Tips: Anda menulis pernyataan "jika" tetapi lupa menulis kata kunci "maka" sebelum isi pernyataan.`;
       } else if (expectedType === TokenType.DO) {
         friendlyMessage += `. Tips: Anda menulis pernyataan perulangan "selama" tetapi lupa menulis kata kunci "lakukan" setelah kondisi.`;
-      } else if (expectedType === TokenType.RBRACE) {
-        friendlyMessage += `. Tips: Pastikan Anda menutup blok perulangan/kondisi dengan kurung kurawal tutup "}".`;
+      } else if (expectedType === TokenType.SELESAI) {
+        friendlyMessage += `. Tips: Pastikan Anda menutup blok perulangan/kondisi/fungsi dengan kata penutup "selesai".`;
+      } else if (expectedType === TokenType.IS) {
+        friendlyMessage += `. Tips: Pastikan Anda menulis kata kunci "adalah" untuk deklarasi nilai variabel.`;
       } else if (expectedType === TokenType.RPAREN) {
         friendlyMessage += `. Tips: Pastikan Anda menutup tanda kurung dengan kurung tutup ")".`;
       } else if (expectedType === TokenType.EQUALS) {
@@ -134,7 +136,8 @@ class Parser {
         TokenType.GTE,
         TokenType.LTE,
         TokenType.EQ,
-        TokenType.NEQ
+        TokenType.NEQ,
+        TokenType.IS
       ].includes(nextToken.type);
 
       if (!isBinaryOperator) {
@@ -143,9 +146,10 @@ class Parser {
 
       this.advance();
       const right = this.parsePrimaryExpression();
+      const op = nextToken.type === TokenType.IS ? "==" : nextToken.value;
       left = {
         type: "BinaryExpression",
-        operator: nextToken.value,
+        operator: op,
         left,
         right,
         line: nextToken.line,
@@ -156,10 +160,8 @@ class Parser {
     return left;
   }
 
-  // Parse a variable declaration: "buat <type> <identifier> = <expression>"
+  // Parse a variable declaration: "<type> <identifier> adalah <expression>"
   parseVariableDeclaration() {
-    const createToken = this.consume(TokenType.CREATE);
-
     const dataTypeToken = this.currentToken();
 
     if (
@@ -172,7 +174,7 @@ class Parser {
 
     this.advance();
     const nameToken = this.consume(TokenType.IDENTIFIER);
-    this.consume(TokenType.EQUALS);
+    this.consume(TokenType.IS);
     const value = this.parseExpression();
 
     return {
@@ -180,8 +182,8 @@ class Parser {
       dataType: dataTypeToken.value,
       name: nameToken.value,
       value,
-      line: createToken.line,
-      column: createToken.column
+      line: dataTypeToken.line,
+      column: dataTypeToken.column
     };
   }
 
@@ -196,18 +198,55 @@ class Parser {
     };
   }
 
-  // Parse an if statement: "jika <expression> maka <statement> [selain <statement>]"
+  // Parse an if statement: "jika <expression> maka <statement>* [jika tidak <statement>*] selesai"
   parseIfStatement() {
     const ifToken = this.consume(TokenType.IF);
     const condition = this.parseExpression();
     this.consume(TokenType.THEN);
-    const consequent = this.parseStatement();
+    
+    const consequentBody = [];
+    while (
+      this.currentToken().type !== TokenType.ELSE && 
+      this.currentToken().type !== TokenType.SELESAI && 
+      this.currentToken().type !== TokenType.EOF
+    ) {
+      if (this.currentToken().type === TokenType.SEMICOLON) {
+        this.advance();
+        continue;
+      }
+      consequentBody.push(this.parseStatement());
+    }
+    
+    const consequent = {
+      type: "BlockStatement",
+      body: consequentBody,
+      line: ifToken.line,
+      column: ifToken.column
+    };
+    
     let alternate = null;
-
     if (this.currentToken().type === TokenType.ELSE) {
       this.consume(TokenType.ELSE);
-      alternate = this.parseStatement();
+      const alternateBody = [];
+      while (
+        this.currentToken().type !== TokenType.SELESAI && 
+        this.currentToken().type !== TokenType.EOF
+      ) {
+        if (this.currentToken().type === TokenType.SEMICOLON) {
+          this.advance();
+          continue;
+        }
+        alternateBody.push(this.parseStatement());
+      }
+      alternate = {
+        type: "BlockStatement",
+        body: alternateBody,
+        line: ifToken.line,
+        column: ifToken.column
+      };
     }
+    
+    this.consume(TokenType.SELESAI);
 
     return {
       type: "IfStatement",
@@ -219,13 +258,16 @@ class Parser {
     };
   }
 
-  parseBlock() {
-    const beginToken = this.consume(TokenType.LBRACE);
+  parseBlock(beginToken) {
     const body = [];
-    while (this.currentToken().type !== TokenType.RBRACE && this.currentToken().type !== TokenType.EOF) {
+    while (this.currentToken().type !== TokenType.SELESAI && this.currentToken().type !== TokenType.EOF) {
+      if (this.currentToken().type === TokenType.SEMICOLON) {
+        this.advance();
+        continue;
+      }
       body.push(this.parseStatement());
     }
-    this.consume(TokenType.RBRACE);
+    this.consume(TokenType.SELESAI);
     return {
       type: "BlockStatement",
       body,
@@ -238,7 +280,7 @@ class Parser {
     const loopToken = this.consume(TokenType.WHILE);
     const condition = this.parseExpression();
     this.consume(TokenType.DO);
-    const body = this.parseStatement();
+    const body = this.parseBlock(loopToken);
     return {
       type: "LoopStatement",
       condition,
@@ -295,7 +337,7 @@ class Parser {
     }
     this.consume(TokenType.RPAREN);
     
-    const body = this.parseStatement();
+    const body = this.parseBlock(funcToken);
     
     return {
       type: "FunctionDeclaration",
@@ -360,10 +402,15 @@ class Parser {
   parseStatement() {
     const token = this.currentToken();
 
-    if (token.type === TokenType.CREATE) return this.parseVariableDeclaration();
+    if (
+      token.type === TokenType.TEXT_TYPE ||
+      token.type === TokenType.NUMBER_TYPE ||
+      token.type === TokenType.BOOLEAN_TYPE
+    ) {
+      return this.parseVariableDeclaration();
+    }
     if (token.type === TokenType.PRINT) return this.parsePrintStatement();
     if (token.type === TokenType.IF) return this.parseIfStatement();
-    if (token.type === TokenType.LBRACE) return this.parseBlock();
     if (token.type === TokenType.WHILE) return this.parseLoopStatement();
     if (token.type === TokenType.FUNCTION) return this.parseFunctionDeclaration();
     if (token.type === TokenType.RETURN) return this.parseReturnStatement();
@@ -377,7 +424,7 @@ class Parser {
       }
     }
 
-    throw new Error(`Error Sintaks [Baris ${token.line}, Kolom ${token.column}]: Pernyataan "${token.value || token.type}" tidak dikenal. Gunakan kata kunci seperti "buat" untuk variabel, "tampilkan" untuk mencetak output, "jika" untuk kondisi, "selama" untuk perulangan, "fungsi" untuk fungsi, atau "kembalikan" untuk mengembalikan nilai.`);
+    throw new Error(`Error Sintaks [Baris ${token.line}, Kolom ${token.column}]: Pernyataan "${token.value || token.type}" tidak dikenal. Gunakan tipe data "angka", "teks", atau "boolean" untuk deklarasi variabel, "tampilkan" untuk mencetak output, "jika" untuk kondisi, "selama" untuk perulangan, "fungsi" untuk fungsi, atau "kembalikan" untuk mengembalikan nilai.`);
   }
 
   // Parse the whole token stream into a Program AST node.
@@ -385,6 +432,10 @@ class Parser {
     const body = [];
 
     while (this.currentToken().type !== TokenType.EOF) {
+      if (this.currentToken().type === TokenType.SEMICOLON) {
+        this.advance();
+        continue;
+      }
       body.push(this.parseStatement());
     }
 

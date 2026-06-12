@@ -57,7 +57,8 @@ class Lexer {
     let value = word;
 
     if (word === "tampilkan") type = TokenType.PRINT;
-    else if (word === "buat") type = TokenType.CREATE;
+    else if (word === "adalah") type = TokenType.IS;
+    else if (word === "selesai") type = TokenType.SELESAI;
     else if (word === "teks") type = TokenType.TEXT_TYPE;
     else if (word === "angka") type = TokenType.NUMBER_TYPE;
     else if (word === "boolean") type = TokenType.BOOLEAN_TYPE;
@@ -94,6 +95,96 @@ class Lexer {
     else if (word === "lakukan") type = TokenType.DO;
     else if (word === "fungsi") type = TokenType.FUNCTION;
     else if (word === "kembalikan") type = TokenType.RETURN;
+    else if (word === "bukan") {
+      type = TokenType.NEQ;
+      value = "!=";
+    }
+    else if (word === "minimal") {
+      type = TokenType.GTE;
+      value = ">=";
+    }
+    else if (word === "maksimal") {
+      type = TokenType.LTE;
+      value = "<=";
+    }
+    else if (word === "sama") {
+      const savedPos = this.position;
+      const savedLine = this.line;
+      const savedColumn = this.column;
+
+      this.skipWhitespace();
+
+      let nextWord = "";
+      while (
+          this.currentChar() !== null &&
+          /[a-zA-Z_]/.test(this.currentChar())
+      ) {
+          nextWord += this.advance();
+      }
+
+      if (nextWord === "dengan") {
+        type = TokenType.EQ;
+        value = "==";
+      } else {
+        this.position = savedPos;
+        this.line = savedLine;
+        this.column = savedColumn;
+        type = TokenType.IDENTIFIER;
+        value = "sama";
+      }
+    }
+    else if (word === "lebih") {
+      const savedPos = this.position;
+      const savedLine = this.line;
+      const savedColumn = this.column;
+
+      this.skipWhitespace();
+
+      let nextWord = "";
+      while (
+          this.currentChar() !== null &&
+          /[a-zA-Z_]/.test(this.currentChar())
+      ) {
+          nextWord += this.advance();
+      }
+
+      if (nextWord === "dari") {
+        type = TokenType.GT;
+        value = ">";
+      } else {
+        this.position = savedPos;
+        this.line = savedLine;
+        this.column = savedColumn;
+        type = TokenType.IDENTIFIER;
+        value = "lebih";
+      }
+    }
+    else if (word === "kurang") {
+      const savedPos = this.position;
+      const savedLine = this.line;
+      const savedColumn = this.column;
+
+      this.skipWhitespace();
+
+      let nextWord = "";
+      while (
+          this.currentChar() !== null &&
+          /[a-zA-Z_]/.test(this.currentChar())
+      ) {
+          nextWord += this.advance();
+      }
+
+      if (nextWord === "dari") {
+        type = TokenType.LT;
+        value = "<";
+      } else {
+        this.position = savedPos;
+        this.line = savedLine;
+        this.column = savedColumn;
+        type = TokenType.IDENTIFIER;
+        value = "kurang";
+      }
+    }
 
     return new Token(type, value, startLine, startColumn);
   }
@@ -170,9 +261,28 @@ class Lexer {
   getNextToken() {
     this.skipWhitespace();
 
+    let char = this.currentChar();
+    while (
+      char === "#" ||
+      (char === "/" && this.source[this.position + 1] === "/")
+    ) {
+      if (char === "#") {
+        while (this.currentChar() !== null && this.currentChar() !== "\n") {
+          this.advance();
+        }
+      } else {
+        this.advance();
+        this.advance();
+        while (this.currentChar() !== null && this.currentChar() !== "\n") {
+          this.advance();
+        }
+      }
+      this.skipWhitespace();
+      char = this.currentChar();
+    }
+
     const startLine = this.line;
     const startColumn = this.column;
-    const char = this.currentChar();
 
     if (char === null) {
       return new Token(TokenType.EOF, null, startLine, startColumn);
@@ -269,6 +379,11 @@ class Lexer {
     if (char === ",") {
       this.advance();
       return new Token(TokenType.COMMA, ",", startLine, startColumn);
+    }
+
+    if (char === ";") {
+      this.advance();
+      return new Token(TokenType.SEMICOLON, ";", startLine, startColumn);
     }
 
     throw new Error(`Error Sintaks [Baris ${startLine}, Kolom ${startColumn}]: Karakter "${char}" tidak dikenal dalam bahasa NLPSX.`);

@@ -1,9 +1,8 @@
 fungsi kuadrat(angka x)
-{
     kembalikan x * x
-}
+selesai
 
-buat angka hasil = kuadrat(5)
+angka hasil adalah kuadrat(5)
 
 tampilkan "Kuadrat dari 5 adalah:"
 tampilkan hasil

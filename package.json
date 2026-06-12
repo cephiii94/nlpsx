@@ -1,0 +1,11 @@
+{
+  "name": "nlpsx",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NLPSX is an Indonesian-language programming language experiment built in Node.js.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "node tests/run_tests.js"
+  }
+}

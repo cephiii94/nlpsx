@@ -1,34 +1,31 @@
-buat teks nama = "Cecep"
-buat teks game = "Battle Guard"
+teks nama adalah "Cecep"
+teks game adalah "Battle Guard"
 
 tampilkan nama
 tampilkan game
 tampilkan " hai aku menggunakan nlpsx, ini adalah bahasa pemrograman nlp"
 
-buat angka level = 32
+angka level adalah 32
 tampilkan level
 
-buat angka a = 10
-buat angka b = 5
-buat angka total = a + b
+angka a adalah 10
+angka b adalah 5
+angka total adalah a + b
 
 tampilkan total
 
-buat angka i = 1
+angka i adalah 1
 selama i <= 5 lakukan
-{
     tampilkan i
     i = i + 3
-}
+selesai
 
 fungsi perkenalkan(teks nama, teks umur)
-{
     tampilkan "Halo, nama saya " + nama
     tampilkan "Umur saya " + umur + " tahun."
-}
+selesai
 
-buat teks namaSaya = "Budi"
-buat teks umurSaya = "17"
+teks namaSaya adalah "Budi"
+teks umurSaya adalah "17"
 
 perkenalkan(namaSaya, umurSaya)
-

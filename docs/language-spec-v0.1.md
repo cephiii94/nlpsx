@@ -25,10 +25,10 @@ NLPSX berfokus pada:
 
 Keyword adalah kata khusus yang memiliki arti dalam bahasa NLPSX.
 
-### Deklarasi
+### Deklarasi & Nilai Variabel
 
 ```text
-buat
+adalah
 ```
 
 ### Output
@@ -43,6 +43,7 @@ tampilkan
 jika
 maka
 jika tidak
+selesai
 ```
 
 ### Perulangan
@@ -50,8 +51,7 @@ jika tidak
 ```text
 selama
 lakukan
-{
-}
+selesai
 ```
 
 ### Fungsi
@@ -59,6 +59,7 @@ lakukan
 ```text
 fungsi
 kembalikan
+selesai
 ```
 
 ---
@@ -70,7 +71,7 @@ kembalikan
 Menyimpan nilai numerik.
 
 ```nlpsx
-buat angka umur = 20
+angka umur adalah 20
 ```
 
 ### teks
@@ -78,7 +79,7 @@ buat angka umur = 20
 Menyimpan karakter atau kalimat.
 
 ```nlpsx
-buat teks nama = "Cecep"
+teks nama adalah "Cecep"
 ```
 
 ### boolean
@@ -86,7 +87,7 @@ buat teks nama = "Cecep"
 Menyimpan nilai benar atau salah.
 
 ```nlpsx
-buat boolean aktif = benar
+boolean aktif adalah benar
 ```
 
 ---
@@ -101,7 +102,7 @@ salah
 Contoh:
 
 ```nlpsx
-buat boolean premium = benar
+boolean premium adalah benar
 ```
 
 ---
@@ -111,13 +112,15 @@ buat boolean premium = benar
 ### Assignment
 
 ```text
-=
+adalah (untuk inisialisasi awal)
+= (untuk re-assignment variabel yang ada)
 ```
 
 Contoh:
 
 ```nlpsx
-buat angka level = 1
+angka level adalah 1
+level = 2
 ```
 
 ### Matematika
@@ -132,24 +135,24 @@ buat angka level = 1
 Contoh:
 
 ```nlpsx
-buat angka total = 10 + 5
+angka total adalah 10 + 5
 ```
 
 ### Perbandingan
 
-```text
->
-<
->=
-<=
-==
-!=
-```
+NLPSX mendukung simbol matematika maupun kata kunci Bahasa Indonesia alami (sinonim):
+
+*   `==` atau `adalah` atau `sama dengan`
+*   `!=` atau `bukan`
+*   `>` atau `lebih dari`
+*   `<` atau `kurang dari`
+*   `>=` atau `minimal`
+*   `<=` atau `maksimal`
 
 Contoh:
 
 ```nlpsx
-jika umur >= 18 maka
+jika umur lebih dari 18 maka
 ```
 
 ---
@@ -161,7 +164,7 @@ tampilkan "Halo Dunia"
 ```
 
 ```nlpsx
-buat teks nama = "Cecep"
+teks nama adalah "Cecep"
 
 tampilkan nama
 ```
@@ -171,9 +174,9 @@ tampilkan nama
 ## Deklarasi Variabel
 
 ```nlpsx
-buat angka umur = 20
-buat teks nama = "Cecep"
-buat boolean aktif = benar
+angka umur adalah 20
+teks nama adalah "Cecep"
+boolean aktif adalah benar
 ```
 
 ---
@@ -183,6 +186,7 @@ buat boolean aktif = benar
 ```nlpsx
 jika umur >= 18 maka
     tampilkan "Dewasa"
+selesai
 ```
 
 ```nlpsx
@@ -190,6 +194,7 @@ jika umur >= 18 maka
     tampilkan "Dewasa"
 jika tidak
     tampilkan "Anak-anak"
+selesai
 ```
 
 ---
@@ -197,12 +202,11 @@ jika tidak
 ## Perulangan
 
 ```nlpsx
-buat angka i = 1
+angka i adalah 1
 selama i <= 5 lakukan
-{
     tampilkan i
     i = i + 1
-}
+selesai
 ```
 
 ---
@@ -211,11 +215,10 @@ selama i <= 5 lakukan
 
 ```nlpsx
 fungsi tambah(angka a, angka b)
-{
     kembalikan a + b
-}
+selesai
 
-buat angka hasil = tambah(5, 10)
+angka hasil adalah tambah(5, 10)
 tampilkan hasil
 ```
 
@@ -225,6 +228,17 @@ tampilkan hasil
 
 ```nlpsx
 tampilkan "Halo Dunia dari NLPSX"
+```
+
+---
+
+## Komentar
+
+NLPSX mendukung komentar satu baris menggunakan simbol `#` atau `//`. Semua teks di dalam komentar akan diabaikan oleh parser.
+
+```nlpsx
+# Ini komentar pagar
+teks nama adalah "Cecep" // Ini komentar double slash
 ```
 
 ---

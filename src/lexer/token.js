@@ -18,7 +18,8 @@ const TokenType = {
   RETURN: "RETURN",
 
   // Declarations / types
-  CREATE: "CREATE",
+  IS: "IS",
+  SELESAI: "SELESAI",
   TEXT_TYPE: "TEXT_TYPE",
   NUMBER_TYPE: "NUMBER_TYPE",
 
@@ -44,6 +45,8 @@ const TokenType = {
   LTE: "LTE",
   EQ: "EQ",
   NEQ: "NEQ",
+
+  SEMICOLON: "SEMICOLON",
 
   // End of file
   EOF: "EOF",

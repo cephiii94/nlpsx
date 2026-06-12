@@ -36,7 +36,7 @@ class Interpreter {
         return;
       }
     }
-    throw new Error(`Error Runtime [Baris ${line}]: Variabel "${name}" belum dibuat. Silakan buat terlebih dahulu menggunakan "buat".`);
+    throw new Error(`Error Runtime [Baris ${line}]: Variabel "${name}" belum dideklarasikan. Silakan deklarasikan terlebih dahulu menggunakan kata kunci "adalah".`);
   }
 
   getVariable(name, line) {
@@ -45,7 +45,7 @@ class Interpreter {
         return this.scopes[i][name];
       }
     }
-    throw new Error(`Error Runtime [Baris ${line}]: Variabel "${name}" belum dibuat. Silakan buat terlebih dahulu menggunakan "buat".`);
+    throw new Error(`Error Runtime [Baris ${line}]: Variabel "${name}" belum dideklarasikan. Silakan deklarasikan terlebih dahulu menggunakan kata kunci "adalah".`);
   }
 
   // Execute every top-level statement in the program AST.
