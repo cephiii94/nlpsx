@@ -10,7 +10,7 @@ NLPSX adalah eksperimen bahasa pemrograman yang dirancang agar lebih dekat denga
 
 NLPSX ingin menjadi bahasa pemrograman yang menuliskan makna, bukan mekanisme.
 
-Bahasa ini dirancang agar manusia dapat menulis instruksi secara lebih natural, mudah dibaca, dan tetap memiliki struktur yang kuat untuk dieksekusi oleh mesin.
+Bahasa ini dirancang agar manusia dapat menulis instruksi secara lebih natural, mudah dibaca, dan tetap memiliki struktur yang kuat untuk dieksekusi oleh mesin. Jadi, mesin mempelajari bahasa manusia.
 
 ---
 
