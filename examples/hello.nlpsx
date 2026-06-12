@@ -1,2 +1,15 @@
 buat teks nama = "Cecep"
+buat teks game = "Battle Guard"
+
 tampilkan nama
+tampilkan game
+tampilkan " hai aku menggunakan nlpsx, ini adalah bahasa pemrograman nlp"
+
+buat angka level = 32
+tampilkan level
+
+buat angka a = 10
+buat angka b = 5
+buat angka total = a + b
+
+tampilkan total

@@ -8,9 +8,12 @@ const TokenType = {
 
   IDENTIFIER: "IDENTIFIER",
   EQUALS: "EQUALS",
+  PLUS: "PLUS",
+  NUMBER: "NUMBER",
+  NUMBER_TYPE: "NUMBER_TYPE",
 
   STRING: "STRING",
-  EOF: "EOF",
+  EOF: "EOF"
 };
 
 class Token {

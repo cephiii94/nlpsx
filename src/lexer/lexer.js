@@ -58,8 +58,15 @@ class Lexer {
         return new Token(TokenType.TEXT_TYPE, word);
     }
 
+    if (word === "angka") {
+    return new Token(TokenType.NUMBER_TYPE, word);
+    }
+
+
+
     return new Token(TokenType.IDENTIFIER, word);
     }
+
   readString() {
     let text = "";
     const startColumn = this.column;
@@ -78,6 +85,21 @@ class Lexer {
 
     return new Token(TokenType.STRING, text, this.line, startColumn);
   }
+    readNumber() {
+    let number = "";
+
+    while (
+        this.currentChar() !== null &&
+        /[0-9]/.test(this.currentChar())
+    ) {
+        number += this.advance();
+    }
+
+    return new Token(
+        TokenType.NUMBER,
+        Number(number)
+    );
+    }
 
   getNextToken() {
     this.skipWhitespace();
@@ -101,6 +123,15 @@ class Lexer {
      return new Token(TokenType.EQUALS, "=");
     }
 
+    if (/[0-9]/.test(char)) {
+        return this.readNumber();
+    }
+
+    if (char === "+") {
+    this.advance();
+    return new Token(TokenType.PLUS, "+");
+    }
+    
     throw new Error(`Karakter tidak dikenal: ${char}`);
   }
 
